@@ -14,9 +14,13 @@ final class PublicController extends Controller
     public function home(): void
     {
         $anio = (int) date('Y');
-        $results = $this->buildResults('', $anio);
+        $term = '';
+        $results = $this->buildResults($term, $anio);
+        $totals = (new Abono())->totalsMatrix($anio);
+        $cuota = (new Cuota())->getByYear($anio);
+        $valorCuota = (float) ($cuota['valor'] ?? 0);
 
-        $this->view('public/search', compact('results', 'anio'));
+        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'valorCuota'));
     }
 
     public function search(): void
@@ -24,8 +28,11 @@ final class PublicController extends Controller
         $term = trim($_GET['q'] ?? '');
         $anio = (int) ($_GET['anio'] ?? date('Y'));
         $results = $this->buildResults($term, $anio);
+        $totals = (new Abono())->totalsMatrix($anio);
+        $cuota = (new Cuota())->getByYear($anio);
+        $valorCuota = (float) ($cuota['valor'] ?? 0);
 
-        $this->view('public/search', compact('results', 'term', 'anio'));
+        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'valorCuota'));
     }
 
     private function buildResults(string $term, int $anio): array
