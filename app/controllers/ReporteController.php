@@ -8,6 +8,7 @@ use App\Core\Controller;
 use App\Models\Abono;
 use App\Models\Alumno;
 use App\Models\Cuota;
+use Throwable;
 
 final class ReporteController extends Controller
 {
@@ -25,10 +26,19 @@ final class ReporteController extends Controller
 
         $abonoModel = new Abono();
         $alumnoModel = new Alumno();
-        $statsByMonth = $abonoModel->statsByYear($anio);
-        $totalPayments = $abonoModel->totalPayments($anio);
-        $paymentsToday = $abonoModel->paymentsToday();
-        $morosos = $alumnoModel->getMorosos($anio);
+
+        try {
+            $statsByMonth = $abonoModel->statsByYear($anio);
+            $totalPayments = $abonoModel->totalPayments($anio);
+            $paymentsToday = $abonoModel->paymentsToday();
+            $morosos = $alumnoModel->getMorosos($anio);
+        } catch (Throwable $exception) {
+            $statsByMonth = array_fill(1, 12, 0.0);
+            $totalPayments = 0.0;
+            $paymentsToday = 0.0;
+            $morosos = [];
+            $_SESSION['flash_error'] = 'No se pudo cargar toda la información del dashboard. Verifica la configuración de cuotas para el año seleccionado.';
+        }
 
         $this->view('dashboard/index', compact('anio', 'statsByMonth', 'totalPayments', 'paymentsToday', 'morosos'));
     }

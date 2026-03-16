@@ -3,10 +3,34 @@ $partial: #ffc107;
 $pending: #dc3545;
 
 .payment-matrix {
-  .btn {
-    color: #fff;
-    font-size: 0.8rem;
+  th,
+  td {
+    border-color: #c7ccd1;
+    min-width: 92px;
+    vertical-align: middle;
   }
+
+  thead th {
+    background: #e9ecef;
+    font-weight: 700;
+    color: #111;
+  }
+
+  th:first-child,
+  td:first-child {
+    min-width: 160px;
+  }
+}
+
+.status-pill {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
 }
 
 .status-paid { background-color: $paid; }
