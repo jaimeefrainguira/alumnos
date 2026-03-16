@@ -3,6 +3,15 @@
     <h4>Matriz de pagos <?= $anio; ?></h4>
     <a class="btn btn-outline-primary" href="/reportes/general?anio=<?= $anio; ?>">Descargar PDF General</a>
 </div>
+<div class="card mb-4"><div class="card-body">
+<form method="post" action="/alumnos" class="row g-2">
+    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+    <div class="col-md-4"><input class="form-control" name="nombre" placeholder="Nombre" required></div>
+    <div class="col-md-3"><input class="form-control" name="telefono" placeholder="Teléfono"></div>
+    <div class="col-md-3"><input class="form-control" name="direccion" placeholder="Dirección"></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100">Crear alumno</button></div>
+    <div class="col-12"><small class="text-muted">El código del alumno se genera automáticamente.</small></div>
+</form></div></div>
 
 <div class="table-responsive">
 <table class="table table-bordered table-sm align-middle payment-matrix">

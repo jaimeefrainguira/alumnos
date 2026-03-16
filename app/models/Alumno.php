@@ -16,12 +16,14 @@ final class Alumno extends Model
 
     public function create(array $data): bool
     {
+        $codigo = $this->nextCode();
+
         $stmt = $this->db->prepare(
             'INSERT INTO alumnos (codigo, nombre, telefono, direccion) VALUES (:codigo, :nombre, :telefono, :direccion)'
         );
 
         return $stmt->execute([
-            'codigo' => $data['codigo'],
+            'codigo' => $codigo,
             'nombre' => $data['nombre'],
             'telefono' => $data['telefono'],
             'direccion' => $data['direccion'],
@@ -30,6 +32,11 @@ final class Alumno extends Model
 
     public function search(string $term): array
     {
+        $term = trim($term);
+        if ($term == '') {
+            return $this->all();
+        }
+
         $stmt = $this->db->prepare(
             'SELECT id, codigo, nombre, telefono FROM alumnos
              WHERE nombre LIKE :term OR telefono LIKE :term OR codigo LIKE :term
@@ -70,5 +77,14 @@ final class Alumno extends Model
         $stmt->execute(['anio' => $anio]);
 
         return $stmt->fetchAll();
+    }
+
+    private function nextCode(): string
+    {
+        $stmt = $this->db->query("SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 5) AS UNSIGNED)), 0) AS max_codigo FROM alumnos WHERE codigo LIKE 'ALU-%'");
+        $row = $stmt->fetch();
+        $next = ((int) ($row['max_codigo'] ?? 0)) + 1;
+
+        return sprintf('ALU-%03d', $next);
     }
 }

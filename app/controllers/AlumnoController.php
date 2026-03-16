@@ -61,14 +61,13 @@ final class AlumnoController extends Controller
         }
 
         $data = [
-            'codigo' => trim($_POST['codigo'] ?? ''),
             'nombre' => trim($_POST['nombre'] ?? ''),
             'telefono' => trim($_POST['telefono'] ?? ''),
             'direccion' => trim($_POST['direccion'] ?? ''),
         ];
 
-        if ($data['codigo'] === '' || $data['nombre'] === '') {
-            $_SESSION['flash_error'] = 'Código y nombre son obligatorios.';
+        if ($data['nombre'] === '') {
+            $_SESSION['flash_error'] = 'El nombre es obligatorio.';
             $this->redirect('/alumnos');
         }
 
