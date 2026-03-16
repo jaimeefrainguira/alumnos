@@ -19,7 +19,12 @@
 <tbody>
 <?php foreach ($alumnos as $alumno): ?>
 <tr>
-    <td><?= htmlspecialchars($alumno['nombre']); ?><br><small><?= htmlspecialchars($alumno['codigo']); ?></small></td>
+    <td>
+        <a href="/alumnos/ver?id=<?= (int) $alumno['id']; ?>&anio=<?= $anio; ?>" class="text-decoration-none fw-bold">
+            <?= htmlspecialchars($alumno['nombre']); ?>
+        </a><br>
+        <small><?= htmlspecialchars($alumno['codigo']); ?></small>
+    </td>
     <?php foreach ($meses as $numero => $nombreMes):
         $paid = (float) ($totals[$alumno['id']][$numero] ?? 0);
         $status = $paid >= $valorCuota && $valorCuota > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');

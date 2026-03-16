@@ -20,9 +20,41 @@ $saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
     <div class="col-md-4"><div class="card p-3"><small>Saldo pendiente</small><h5>$<?= number_format((float) $saldoPendiente, 2); ?></h5></div></div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <h5>Movimientos por mes</h5>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Datos del alumno</h5>
+                <form method="post" action="/alumnos/editar" class="mb-3">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+                    <input type="hidden" name="id" value="<?= (int) $alumno['id']; ?>">
+                    <div class="mb-2">
+                        <label class="form-label mb-0"><small>Nombre</small></label>
+                        <input class="form-control form-control-sm" name="nombre" value="<?= htmlspecialchars($alumno['nombre']); ?>" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label mb-0"><small>Teléfono</small></label>
+                        <input class="form-control form-control-sm" name="telefono" value="<?= htmlspecialchars($alumno['telefono']); ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label mb-0"><small>Dirección</small></label>
+                        <input class="form-control form-control-sm" name="direccion" value="<?= htmlspecialchars($alumno['direccion']); ?>">
+                    </div>
+                    <button class="btn btn-sm btn-primary w-100">Guardar Cambios</button>
+                </form>
+                <form method="post" action="/alumnos/eliminar" onsubmit="return confirm('¿Seguro que deseas eliminar este alumno? Esta acción no se puede deshacer y borrará todos sus abonos.');">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+                    <input type="hidden" name="id" value="<?= (int) $alumno['id']; ?>">
+                    <button class="btn btn-sm btn-outline-danger w-100">Eliminar Alumno</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5>Movimientos por mes</h5>
         <div class="table-responsive">
             <table class="table table-sm align-middle">
                 <thead><tr><th>Mes</th><th>Total abonado</th><th>Detalle</th></tr></thead>
@@ -56,4 +88,6 @@ $saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
             </table>
         </div>
     </div>
+</div>
+</div>
 </div>

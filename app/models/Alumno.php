@@ -30,6 +30,26 @@ final class Alumno extends Model
         ]);
     }
 
+    public function update(int $id, array $data): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE alumnos SET nombre = :nombre, telefono = :telefono, direccion = :direccion WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            'id' => $id,
+            'nombre' => $data['nombre'],
+            'telefono' => $data['telefono'],
+            'direccion' => $data['direccion'],
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM alumnos WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
+    }
+
     public function search(string $term): array
     {
         $term = trim($term);

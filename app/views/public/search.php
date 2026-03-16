@@ -26,7 +26,14 @@
                                     $paid = (float) (($totals[(int) $alumno['id']][$numero] ?? 0));
                                     $status = $paid >= ($valorCuota ?? 0) && ($valorCuota ?? 0) > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');
                                 ?>
-                                    <td><span class="status-pill status-<?= $status; ?>">$<?= number_format($paid, 2); ?></span></td>
+                                    <td>
+                                        <button class="btn btn-sm w-100 status-<?= $status; ?> payment-cell-public"
+                                                data-alumno-id="<?= (int) $alumno['id']; ?>"
+                                                data-mes="<?= $numero; ?>"
+                                                data-anio="<?= (int) ($anio ?? date('Y')); ?>">
+                                            $<?= number_format($paid, 2); ?>
+                                        </button>
+                                    </td>
                                 <?php endforeach; ?>
                             </tr>
                         <?php endforeach; ?>
@@ -36,4 +43,21 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal Público (Solo Lectura) -->
+<div class="modal fade" id="paymentModalPublic" tabindex="-1" aria-labelledby="paymentModalPublicLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalPublicLabel">Detalle de Abonos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="abonoHistoryPublic" class="list-group">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>

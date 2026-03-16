@@ -49,6 +49,8 @@ $router->get('/dashboard', [ReporteController::class, 'dashboard']);
 $router->get('/alumnos', [AlumnoController::class, 'index']);
 $router->get('/alumnos/ver', [AlumnoController::class, 'show']);
 $router->post('/alumnos', [AlumnoController::class, 'store']);
+$router->post('/alumnos/editar', [AlumnoController::class, 'edit']);
+$router->post('/alumnos/eliminar', [AlumnoController::class, 'delete']);
 $router->post('/abonos', [AbonoController::class, 'store']);
 $router->get('/abonos/historial', [AbonoController::class, 'history']);
 $router->get('/cuotas', [CuotaController::class, 'index']);
