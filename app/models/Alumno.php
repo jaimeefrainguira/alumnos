@@ -57,11 +57,11 @@ final class Alumno extends Model
 
     public function getMorosos(int $anio): array
     {
-        $sql = 'SELECT a.id, a.nombre, m.mes,
+        $sql = "SELECT a.id, a.nombre, m.mes,
                        CASE m.mes
-                            WHEN 1 THEN "Enero" WHEN 2 THEN "Febrero" WHEN 3 THEN "Marzo" WHEN 4 THEN "Abril"
-                            WHEN 5 THEN "Mayo" WHEN 6 THEN "Junio" WHEN 7 THEN "Julio" WHEN 8 THEN "Agosto"
-                            WHEN 9 THEN "Septiembre" WHEN 10 THEN "Octubre" WHEN 11 THEN "Noviembre" WHEN 12 THEN "Diciembre"
+                            WHEN 1 THEN 'Enero' WHEN 2 THEN 'Febrero' WHEN 3 THEN 'Marzo' WHEN 4 THEN 'Abril'
+                            WHEN 5 THEN 'Mayo' WHEN 6 THEN 'Junio' WHEN 7 THEN 'Julio' WHEN 8 THEN 'Agosto'
+                            WHEN 9 THEN 'Septiembre' WHEN 10 THEN 'Octubre' WHEN 11 THEN 'Noviembre' WHEN 12 THEN 'Diciembre'
                        END AS mes_nombre,
                        c.valor - COALESCE(SUM(ab.valor),0) AS pendiente
                 FROM alumnos a
@@ -71,7 +71,7 @@ final class Alumno extends Model
                 LEFT JOIN abonos ab ON ab.alumno_id = a.id AND ab.anio = :anio AND ab.mes = m.mes
                 GROUP BY a.id, a.nombre, m.mes, c.valor
                 HAVING pendiente > 0
-                ORDER BY a.nombre, m.mes';
+                ORDER BY a.nombre, m.mes";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['anio' => $anio]);
