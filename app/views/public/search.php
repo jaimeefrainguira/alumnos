@@ -44,7 +44,7 @@
                                     $paid = (float) (($totals[(int) $alumno['id']][$numero] ?? 0));
                                     $status = $paid >= ($valorCuota ?? 0) && ($valorCuota ?? 0) > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');
                                 ?>
-                                    <td><span class="btn btn-sm w-100 status-<?= $status; ?> disabled">$<?= number_format($paid, 2); ?></span></td>
+                                    <td><span class="status-pill status-<?= $status; ?>">$<?= number_format($paid, 2); ?></span></td>
                                 <?php endforeach; ?>
                             </tr>
                         <?php endforeach; ?>
