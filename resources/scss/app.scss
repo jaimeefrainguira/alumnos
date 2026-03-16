@@ -1,0 +1,14 @@
+$paid: #198754;
+$partial: #ffc107;
+$pending: #dc3545;
+
+.payment-matrix {
+  .btn {
+    color: #fff;
+    font-size: 0.8rem;
+  }
+}
+
+.status-paid { background-color: $paid; }
+.status-partial { background-color: $partial; color: #212529 !important; }
+.status-pending { background-color: $pending; }

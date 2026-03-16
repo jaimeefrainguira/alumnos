@@ -1,0 +1,9 @@
+{
+  "name": "colegio/pagos-alumnos",
+  "description": "Sistema MVC de gestión de pagos con abonos parciales",
+  "type": "project",
+  "require": {
+    "php": "^8.0",
+    "dompdf/dompdf": "^2.0"
+  }
+}
