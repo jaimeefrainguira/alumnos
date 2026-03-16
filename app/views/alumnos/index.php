@@ -15,7 +15,7 @@
 
 <div class="table-responsive">
 <table class="table table-bordered table-sm align-middle payment-matrix">
-<thead><tr><th>Alumno</th><?php foreach($meses as $m): ?><th><?= $m; ?></th><?php endforeach; ?><th>Detalle</th></tr></thead>
+<thead><tr><th>Alumno</th><?php foreach($meses as $m): ?><th><?= $m; ?></th><?php endforeach; ?></tr></thead>
 <tbody>
 <?php foreach ($alumnos as $alumno): ?>
 <tr>
@@ -24,11 +24,16 @@
         $paid = (float) ($totals[$alumno['id']][$numero] ?? 0);
         $status = $paid >= $valorCuota && $valorCuota > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');
     ?>
-        <td><span class="status-pill status-<?= $status; ?>">$<?= number_format($paid, 2); ?></span></td>
+        <td>
+            <button class="btn btn-sm w-100 status-<?= $status; ?> payment-cell"
+                    data-alumno-id="<?= (int) $alumno['id']; ?>"
+                    data-alumno-nombre="<?= htmlspecialchars($alumno['nombre']); ?>"
+                    data-mes="<?= $numero; ?>"
+                    data-anio="<?= $anio; ?>">
+                $<?= number_format($paid, 2); ?>
+            </button>
+        </td>
     <?php endforeach; ?>
-    <td>
-        <a class="btn btn-outline-secondary btn-sm w-100" href="/alumnos/ver?id=<?= (int) $alumno['id']; ?>&anio=<?= (int) $anio; ?>">Ver</a>
-    </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
