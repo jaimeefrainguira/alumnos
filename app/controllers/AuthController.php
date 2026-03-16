@@ -46,4 +46,34 @@ final class AuthController extends Controller
         session_destroy();
         $this->redirect('/login');
     }
+
+    public function updateCredentials(): void
+    {
+        if (!isset($_SESSION['auth'])) {
+            $this->redirect('/login');
+        }
+
+        if (!$this->validateCsrfToken($_POST['csrf'] ?? null)) {
+            $_SESSION['flash_error'] = 'CSRF inválido.';
+            $this->redirect('/dashboard');
+        }
+
+        $userId = (int) $_SESSION['auth']['id'];
+        $newUsername = trim($_POST['nuevo_usuario'] ?? '');
+        $newPassword = (string) ($_POST['nueva_password'] ?? '');
+
+        $usuarioModel = new Usuario();
+
+        if ($newUsername !== '') {
+            $usuarioModel->updateUsername($userId, $newUsername);
+            $_SESSION['auth']['usuario'] = $newUsername;
+        }
+
+        if ($newPassword !== '') {
+            $usuarioModel->updatePassword($userId, $newPassword);
+        }
+
+        $_SESSION['flash_ok'] = 'Credenciales actualizadas correctamente.';
+        $this->redirect('/dashboard');
+    }
 }

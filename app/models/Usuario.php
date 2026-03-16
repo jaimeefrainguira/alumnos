@@ -16,4 +16,17 @@ final class Usuario extends Model
 
         return $result ?: null;
     }
+
+    public function updatePassword(int $userId, string $newPassword): bool
+    {
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare('UPDATE usuarios SET password = :password WHERE id = :id');
+        return $stmt->execute(['password' => $hash, 'id' => $userId]);
+    }
+
+    public function updateUsername(int $userId, string $newUsername): bool
+    {
+        $stmt = $this->db->prepare('UPDATE usuarios SET usuario = :usuario WHERE id = :id');
+        return $stmt->execute(['usuario' => $newUsername, 'id' => $userId]);
+    }
 }

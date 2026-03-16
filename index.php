@@ -43,6 +43,7 @@ $router->get('/buscar', [PublicController::class, 'search']);
 $router->get('/login', [AuthController::class, 'loginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
+$router->post('/ajustes/credenciales', [AuthController::class, 'updateCredentials']);
 
 $router->get('/dashboard', [ReporteController::class, 'dashboard']);
 $router->get('/alumnos', [AlumnoController::class, 'index']);

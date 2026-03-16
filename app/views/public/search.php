@@ -12,24 +12,6 @@
             </div>
         </div>
 
-        <div class="card mb-3">
-            <div class="card-body">
-                <table class="table table-striped mb-0">
-                    <thead><tr><th>Alumno</th><th>Código</th><th>Estado</th><th>Acción</th></tr></thead>
-                    <tbody>
-                    <?php foreach (($results ?? []) as $r): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($r['nombre']); ?></td>
-                            <td><?= htmlspecialchars($r['codigo']); ?></td>
-                            <td><?= htmlspecialchars($r['estado']); ?></td>
-                            <td><a class="btn btn-outline-secondary btn-sm" href="/reportes/alumno?id=<?= (int) $r['id']; ?>&anio=<?= (int) ($anio ?? date('Y')); ?>">PDF</a></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <div class="card">
             <div class="card-body">
                 <h5 class="mb-3">Matriz de pagos <?= (int) ($anio ?? date('Y')); ?></h5>
