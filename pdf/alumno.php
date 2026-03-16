@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-use Dompdf\Dompdf;
+use App\Core\PdfFactory;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-$dompdf = new Dompdf();
+$dompdf = PdfFactory::make();
 $totalPagado = array_sum($totals);
 $saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
 

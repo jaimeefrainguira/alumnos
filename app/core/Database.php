@@ -19,30 +19,45 @@ final class Database
 
         $config = require __DIR__ . '/../../config/database.php';
 
-        $dsn = sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=%s',
-            $config['host'],
-            $config['port'],
-            $config['database'],
-            $config['charset']
-        );
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
 
-        try {
-            self::$connection = new PDO(
-                $dsn,
-                $config['username'],
-                $config['password'],
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]
+        $databaseNames = self::candidateDatabases((string) $config['database']);
+
+        foreach ($databaseNames as $databaseName) {
+            $dsn = sprintf(
+                'mysql:host=%s;port=%s;dbname=%s;charset=%s',
+                $config['host'],
+                $config['port'],
+                $databaseName,
+                $config['charset']
             );
-        } catch (PDOException $exception) {
-            http_response_code(500);
-            exit('Error de conexión a base de datos.');
+
+            try {
+                self::$connection = new PDO($dsn, $config['username'], $config['password'], $options);
+                return self::$connection;
+            } catch (PDOException $exception) {
+                continue;
+            }
         }
 
-        return self::$connection;
+        http_response_code(500);
+        exit('Error de conexión a base de datos. Revisa DB_NAME en config/database.php o variables de entorno.');
+
+    }
+
+    private static function candidateDatabases(string $database): array
+    {
+        $candidates = [$database];
+
+        if (str_contains($database, 'alumos')) {
+            $candidates[] = str_replace('alumos', 'alumnos', $database);
+        }
+
+        return array_values(array_unique(array_filter($candidates)));
+
     }
 }

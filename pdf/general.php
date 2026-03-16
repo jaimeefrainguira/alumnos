@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-use Dompdf\Dompdf;
+use App\Core\PdfFactory;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-$dompdf = new Dompdf();
+$dompdf = PdfFactory::make();
 $html = '<h2>Reporte general de pagos ' . $anio . '</h2>';
 $html .= '<table border="1" cellspacing="0" cellpadding="4" width="100%"><tr><th>Alumno</th>';
 for ($m = 1; $m <= 12; $m++) {
