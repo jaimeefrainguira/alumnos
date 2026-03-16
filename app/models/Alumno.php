@@ -50,7 +50,13 @@ final class Alumno extends Model
 
     public function getMorosos(int $anio): array
     {
-        $sql = 'SELECT a.id, a.nombre, m.mes, c.valor - COALESCE(SUM(ab.valor),0) AS pendiente
+        $sql = 'SELECT a.id, a.nombre, m.mes,
+                       CASE m.mes
+                            WHEN 1 THEN "Enero" WHEN 2 THEN "Febrero" WHEN 3 THEN "Marzo" WHEN 4 THEN "Abril"
+                            WHEN 5 THEN "Mayo" WHEN 6 THEN "Junio" WHEN 7 THEN "Julio" WHEN 8 THEN "Agosto"
+                            WHEN 9 THEN "Septiembre" WHEN 10 THEN "Octubre" WHEN 11 THEN "Noviembre" WHEN 12 THEN "Diciembre"
+                       END AS mes_nombre,
+                       c.valor - COALESCE(SUM(ab.valor),0) AS pendiente
                 FROM alumnos a
                 CROSS JOIN (SELECT 1 mes UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
                             UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) m

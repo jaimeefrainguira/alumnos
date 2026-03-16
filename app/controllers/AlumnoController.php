@@ -31,6 +31,27 @@ final class AlumnoController extends Controller
         $this->view('alumnos/index', compact('alumnos', 'totals', 'anio', 'valorCuota'));
     }
 
+    public function show(): void
+    {
+        $this->guard();
+        $alumnoId = (int) ($_GET['id'] ?? 0);
+        $anio = (int) ($_GET['anio'] ?? date('Y'));
+
+        $alumno = (new Alumno())->find($alumnoId);
+        if ($alumno === null) {
+            http_response_code(404);
+            exit('Alumno no encontrado.');
+        }
+
+        $abonoModel = new Abono();
+        $detallePagos = $abonoModel->detailsByAlumno($alumnoId, $anio);
+        $totals = $abonoModel->totalsByAlumno($alumnoId, $anio);
+        $cuota = (new Cuota())->getByYear($anio);
+        $valorCuota = (float) ($cuota['valor'] ?? 0);
+
+        $this->view('alumnos/show', compact('alumno', 'anio', 'detallePagos', 'totals', 'valorCuota'));
+    }
+
     public function store(): void
     {
         $this->guard();

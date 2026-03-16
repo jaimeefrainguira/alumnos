@@ -16,7 +16,7 @@
             <thead><tr><th>Alumno</th><th>Mes</th><th>Monto pendiente</th></tr></thead>
             <tbody>
             <?php foreach ($morosos as $m): ?>
-                <tr><td><?= htmlspecialchars($m['nombre']); ?></td><td><?= (int) $m['mes']; ?></td><td>$<?= number_format((float) $m['pendiente'], 2); ?></td></tr>
+                <tr><td><?= htmlspecialchars($m['nombre']); ?></td><td><?= htmlspecialchars($m['mes_nombre'] ?? (string) $m['mes']); ?></td><td>$<?= number_format((float) $m['pendiente'], 2); ?></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
