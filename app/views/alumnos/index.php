@@ -39,3 +39,40 @@
 </tbody>
 </table>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalLabel">Detalles de Abonos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="mb-3">Historial de Pagos del Mes</h6>
+        <ul id="abonoHistory" class="list-group mb-4">
+          <!-- Populated by JS -->
+        </ul>
+        
+        <h6 class="mb-3">Añadir Nuevo Abono</h6>
+        <form id="abonoForm">
+          <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? ''); ?>">
+          <input type="hidden" name="alumno_id" id="formAlumnoId">
+          <input type="hidden" name="mes" id="formMes">
+          <input type="hidden" name="anio" id="formAnio">
+          <div class="mb-3">
+            <label for="fecha_abono" class="form-label">Fecha</label>
+            <input type="date" class="form-control" name="fecha_abono" id="fecha_abono" value="<?= date('Y-m-d'); ?>" required>
+          </div>
+          <div class="mb-3">
+            <label for="valor" class="form-label">Valor ($)</label>
+            <input type="number" step="0.01" class="form-control" name="valor" id="valor" required>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Registrar Abono</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
