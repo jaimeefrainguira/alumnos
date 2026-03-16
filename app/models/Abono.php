@@ -8,6 +8,21 @@ use App\Core\Model;
 
 final class Abono extends Model
 {
+    private const MONTHS = [
+        1 => 'Enero',
+        2 => 'Febrero',
+        3 => 'Marzo',
+        4 => 'Abril',
+        5 => 'Mayo',
+        6 => 'Junio',
+        7 => 'Julio',
+        8 => 'Agosto',
+        9 => 'Septiembre',
+        10 => 'Octubre',
+        11 => 'Noviembre',
+        12 => 'Diciembre',
+    ];
+
     public function create(array $data): bool
     {
         $stmt = $this->db->prepare(
@@ -83,7 +98,9 @@ final class Abono extends Model
 
     public function paymentsToday(): float
     {
-        $stmt = $this->db->query('SELECT COALESCE(SUM(valor),0) AS total FROM abonos WHERE fecha_abono = CURDATE()');
+        $stmt = $this->db->prepare('SELECT COALESCE(SUM(valor),0) AS total FROM abonos WHERE fecha_abono = :fecha');
+        $stmt->execute(['fecha' => date('Y-m-d')]);
+
         return (float) $stmt->fetch()['total'];
     }
 
@@ -103,5 +120,32 @@ final class Abono extends Model
         }
 
         return $rows;
+    }
+
+    public function detailsByAlumno(int $alumnoId, int $anio): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT mes, valor, fecha_abono
+             FROM abonos
+             WHERE alumno_id = :alumno_id AND anio = :anio
+             ORDER BY mes ASC, fecha_abono ASC, id ASC'
+        );
+        $stmt->execute([
+            'alumno_id' => $alumnoId,
+            'anio' => $anio,
+        ]);
+
+        $grouped = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $monthNumber = (int) $row['mes'];
+            $grouped[$monthNumber]['mes_numero'] = $monthNumber;
+            $grouped[$monthNumber]['mes_nombre'] = self::MONTHS[$monthNumber] ?? (string) $monthNumber;
+            $grouped[$monthNumber]['items'][] = [
+                'valor' => (float) $row['valor'],
+                'fecha_abono' => $row['fecha_abono'],
+            ];
+        }
+
+        return array_values($grouped);
     }
 }

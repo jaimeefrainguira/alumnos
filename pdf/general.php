@@ -5,10 +5,15 @@ declare(strict_types=1);
 use App\Core\PdfFactory;
 
 $dompdf = PdfFactory::make();
+$meses = [
+    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+];
 $html = '<h2>Reporte general de pagos ' . $anio . '</h2>';
 $html .= '<table border="1" cellspacing="0" cellpadding="4" width="100%"><tr><th>Alumno</th>';
 for ($m = 1; $m <= 12; $m++) {
-    $html .= '<th>' . $m . '</th>';
+    $html .= '<th>' . $meses[$m] . '</th>';
 }
 $html .= '</tr>';
 
