@@ -23,7 +23,11 @@ final class Cuota extends Model
             : sprintf('SELECT %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $amountColumn, $yearColumn);
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['anio' => $year, 'anio_plus' => $year + 1]);
+        $params = ['anio' => $year];
+        if ($hasMonth) {
+            $params['anio_plus'] = $year + 1;
+        }
+        $stmt->execute($params);
 
         $rows = $stmt->fetchAll();
         $cuotas = [];
@@ -54,8 +58,9 @@ final class Cuota extends Model
             : sprintf('SELECT id, %s AS anio, 1 AS mes, %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $yearColumn, $amountColumn, $yearColumn);
 
         $stmt = $this->db->prepare($sql);
-        $params = ['anio' => $year, 'anio_plus' => $year + 1];
+        $params = ['anio' => $year];
         if ($hasMonth) {
+            $params['anio_plus'] = $year + 1;
             $params['mes'] = $month;
         }
         $stmt->execute($params);
