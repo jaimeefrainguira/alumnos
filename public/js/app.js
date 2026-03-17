@@ -15,7 +15,9 @@
   if (!modalElement) return;
 
   const modal = new bootstrap.Modal(modalElement);
-  const editModal = new bootstrap.Modal(document.getElementById('editAbonoModal'));
+  const editModalElement = document.getElementById('editAbonoModal');
+  const editModal = editModalElement ? new bootstrap.Modal(editModalElement) : null;
+  
   const historyList = document.getElementById('abonoHistory');
   const form = document.getElementById('abonoForm');
   const editForm = document.getElementById('editAbonoForm');
@@ -38,18 +40,20 @@
       historyList.innerHTML = '';
       json.data.forEach((item) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.className = 'list-group-item d-flex justify-content-between align-items-center py-2';
         
         let actions = '';
         if (form) { // User is authenticated
           actions = `
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-outline-primary py-0 px-1 edit-btn" 
-                      data-id="${item.id}" data-valor="${item.valor}" data-fecha="${item.fecha_abono}">
-                <i class="bi bi-pencil"></i>
+              <button class="btn btn-outline-primary py-1 px-2 edit-btn" 
+                      data-id="${item.id}" data-valor="${item.valor}" data-fecha="${item.fecha_abono}"
+                      title="Editar">
+                <i class="bi bi-pencil"></i> <small>Editar</small>
               </button>
-              <button class="btn btn-outline-danger py-0 px-1 delete-btn" data-id="${item.id}">
-                <i class="bi bi-trash"></i>
+              <button class="btn btn-outline-danger py-1 px-2 delete-btn" data-id="${item.id}"
+                      title="Borrar">
+                <i class="bi bi-trash"></i> <small>Borrar</small>
               </button>
             </div>
           `;
@@ -57,7 +61,8 @@
 
         li.innerHTML = `
           <div>
-            <span>${item.fecha_abono}</span> - <strong>$${Number(item.valor).toFixed(2)}</strong>
+            <span class="text-muted small">${item.fecha_abono}</span><br>
+            <strong>$${Number(item.valor).toFixed(2)}</strong>
           </div>
           ${actions}
         `;
@@ -65,26 +70,31 @@
       });
 
       if (json.data.length === 0) {
-        historyList.innerHTML = '<li class="list-group-item">Sin abonos registrados.</li>';
+        historyList.innerHTML = '<li class="list-group-item text-center text-muted">Sin abonos registrados.</li>';
       }
 
       // Add listeners to new buttons
       historyList.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.getElementById('editAbonoId').value = btn.dataset.id;
-          document.getElementById('editAbonoValor').value = btn.dataset.valor;
-          document.getElementById('editAbonoFecha').value = btn.dataset.fecha;
-          modal.hide();
-          editModal.show();
+          if (editModal) {
+            document.getElementById('editAbonoId').value = btn.dataset.id;
+            document.getElementById('editAbonoValor').value = btn.dataset.valor;
+            document.getElementById('editAbonoFecha').value = btn.dataset.fecha;
+            modal.hide();
+            editModal.show();
+          }
         });
       });
 
       historyList.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
           if (!confirm('¿Seguro que deseas eliminar este abono?')) return;
+          const csrf = document.querySelector('[name="csrf"]')?.value;
+          if (!csrf) { alert('Sesión expirada'); return; }
+          
           const formData = new FormData();
           formData.append('id', btn.dataset.id);
-          formData.append('csrf', document.querySelector('#paymentModal [name="csrf"]').value);
+          formData.append('csrf', csrf);
           
           const res = await fetch('/abonos/eliminar', { method: 'POST', body: formData });
           const data = await res.json();
@@ -136,13 +146,13 @@
       historyListPublic.innerHTML = '';
       json.data.forEach((item) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between';
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
         li.innerHTML = `<span>${item.fecha_abono}</span><strong>$${Number(item.valor).toFixed(2)}</strong>`;
         historyListPublic.appendChild(li);
       });
 
       if (json.data.length === 0) {
-        historyListPublic.innerHTML = '<li class="list-group-item">Sin abonos registrados.</li>';
+        historyListPublic.innerHTML = '<li class="list-group-item text-center">Sin abonos registrados.</li>';
       }
       modalPublic.show();
     });
