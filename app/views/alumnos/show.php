@@ -84,6 +84,16 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
                             ?>
                             <?php if ($detalleMes === []): ?>
                                 <span class="text-muted">Sin pagos</span>
+                                <?php if (isset($_SESSION['auth'])): ?>
+                                <div class="mt-1">
+                                    <button class="btn btn-sm btn-outline-success py-0 px-2 add-abono-direct" 
+                                            data-mes="<?= $mes; ?>" 
+                                            data-mes-nombre="<?= $nombreMes; ?>" 
+                                            style="font-size: 0.75rem;">
+                                        <i class="bi bi-plus-lg"></i> Registrar
+                                    </button>
+                                </div>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <ul class="mb-0 ps-3">
                                     <?php foreach ($detalleMes[0]['items'] as $pago): ?>
@@ -107,6 +117,14 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
                                             <?php endif; ?>
                                         </li>
                                     <?php endforeach; ?>
+                                    <?php if (isset($_SESSION['auth'])): ?>
+                                    <li class="list-unstyled mt-1">
+                                        <button class="btn btn-sm btn-link text-success p-0 text-decoration-none add-abono-direct" 
+                                                data-mes="<?= $mes; ?>" data-mes-nombre="<?= $nombreMes; ?>" style="font-size: 0.75rem;">
+                                            <i class="bi bi-plus-circle"></i> Nuevo abono
+                                        </button>
+                                    </li>
+                                    <?php endif; ?>
                                 </ul>
                             <?php endif; ?>
                         </td>
@@ -147,10 +165,40 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
     </div>
 </div>
 
+<!-- Modal para nuevo abono -->
+<div class="modal fade" id="newAbonoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title">Nuevo Abono - <span id="newAbonoTitleMes"></span></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newAbonoForm">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+                    <input type="hidden" name="alumno_id" value="<?= (int) $alumno['id']; ?>">
+                    <input type="hidden" name="anio" value="<?= (int) $anio; ?>">
+                    <input type="hidden" name="mes" id="newAbonoMes">
+                    <div class="mb-2">
+                        <label class="form-label mb-0"><small>Fecha</small></label>
+                        <input type="date" class="form-control form-control-sm" name="fecha_abono" value="<?= date('Y-m-d'); ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label mb-0"><small>Valor ($)</small></label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="valor" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success w-100">Registrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const editModal = new bootstrap.Modal(document.getElementById('editAbonoModal'));
+    const newModal = new bootstrap.Modal(document.getElementById('newAbonoModal'));
     
     // Abrir modal de edición
     document.querySelectorAll('.edit-abono').forEach(btn => {
@@ -159,6 +207,15 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editAbonoValor').value = this.dataset.valor;
             document.getElementById('editAbonoFecha').value = this.dataset.fecha;
             editModal.show();
+        });
+    });
+
+    // Abrir modal de nuevo
+    document.querySelectorAll('.add-abono-direct').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('newAbonoMes').value = this.dataset.mes;
+            document.getElementById('newAbonoTitleMes').textContent = this.dataset.mesNombre;
+            newModal.show();
         });
     });
 
@@ -177,6 +234,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             } else {
                 alert(data.message || 'Error al actualizar');
+            }
+        } catch (err) {
+            alert('Error de conexión');
+        }
+    });
+
+    // Manejar envío de nuevo
+    document.getElementById('newAbonoForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        try {
+            const res = await fetch('/abonos', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.ok) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error al registrar');
             }
         } catch (err) {
             alert('Error de conexión');
