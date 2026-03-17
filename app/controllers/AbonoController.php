@@ -64,4 +64,48 @@ final class AbonoController extends Controller
         $data = (new Abono())->monthHistory($alumnoId, $mes, $anio);
         $this->json(['ok' => true, 'data' => $data]);
     }
+
+    public function update(): void
+    {
+        $this->guard();
+
+        if (!$this->validateCsrfToken($_POST['csrf'] ?? null)) {
+            $this->json(['ok' => false, 'message' => 'CSRF inválido'], 419);
+            return;
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+        $data = [
+            'valor' => (float) ($_POST['valor'] ?? 0),
+            'fecha_abono' => $_POST['fecha_abono'] ?? date('Y-m-d'),
+        ];
+
+        if ($id < 1 || $data['valor'] <= 0) {
+            $this->json(['ok' => false, 'message' => 'Datos inválidos'], 422);
+            return;
+        }
+
+        (new Abono())->update($id, $data);
+        $this->json(['ok' => true, 'message' => 'Abono actualizado']);
+    }
+
+    public function delete(): void
+    {
+        $this->guard();
+
+        if (!$this->validateCsrfToken($_POST['csrf'] ?? null)) {
+            $this->json(['ok' => false, 'message' => 'CSRF inválido'], 419);
+            return;
+        }
+
+        $id = (int) ($_POST['id'] ?? 0);
+
+        if ($id < 1) {
+            $this->json(['ok' => false, 'message' => 'ID inválido'], 422);
+            return;
+        }
+
+        (new Abono())->delete($id);
+        $this->json(['ok' => true, 'message' => 'Abono eliminado']);
+    }
 }

@@ -87,7 +87,25 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
                             <?php else: ?>
                                 <ul class="mb-0 ps-3">
                                     <?php foreach ($detalleMes[0]['items'] as $pago): ?>
-                                        <li><?= htmlspecialchars($pago['fecha_abono']); ?> - <strong>$<?= number_format((float) $pago['valor'], 2); ?></strong></li>
+                                        <li class="d-flex justify-content-between align-items-center mb-1">
+                                            <span><?= htmlspecialchars($pago['fecha_abono']); ?> - <strong>$<?= number_format((float) $pago['valor'], 2); ?></strong></span>
+                                            <?php if (isset($_SESSION['auth'])): ?>
+                                            <div class="btn-group btn-group-sm ms-2">
+                                                <button class="btn btn-sm btn-outline-primary py-0 px-1 edit-abono" 
+                                                        data-id="<?= $pago['id']; ?>" 
+                                                        data-valor="<?= $pago['valor']; ?>" 
+                                                        data-fecha="<?= $pago['fecha_abono']; ?>"
+                                                        title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger py-0 px-1 delete-abono" 
+                                                        data-id="<?= $pago['id']; ?>"
+                                                        title="Borrar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                            <?php endif; ?>
+                                        </li>
                                     <?php endforeach; ?>
                                 </ul>
                             <?php endif; ?>
@@ -101,3 +119,94 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
 </div>
 </div>
 </div>
+
+<!-- Modal para editar abono -->
+<div class="modal fade" id="editAbonoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title">Editar Abono</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAbonoForm">
+                    <input type="hidden" name="id" id="editAbonoId">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+                    <div class="mb-2">
+                        <label class="form-label mb-0"><small>Fecha</small></label>
+                        <input type="date" class="form-control form-control-sm" name="fecha_abono" id="editAbonoFecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label mb-0"><small>Valor ($)</small></label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="valor" id="editAbonoValor" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary w-100">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editModal = new bootstrap.Modal(document.getElementById('editAbonoModal'));
+    
+    // Abrir modal de edición
+    document.querySelectorAll('.edit-abono').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editAbonoId').value = this.dataset.id;
+            document.getElementById('editAbonoValor').value = this.dataset.valor;
+            document.getElementById('editAbonoFecha').value = this.dataset.fecha;
+            editModal.show();
+        });
+    });
+
+    // Manejar envío de edición
+    document.getElementById('editAbonoForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        try {
+            const res = await fetch('/abonos/editar', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.ok) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error al actualizar');
+            }
+        } catch (err) {
+            alert('Error de conexión');
+        }
+    });
+
+    // Manejar eliminación
+    document.querySelectorAll('.delete-abono').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            if (!confirm('¿Seguro que deseas eliminar este abono?')) return;
+            
+            const formData = new FormData();
+            formData.append('id', this.dataset.id);
+            formData.append('csrf', '<?= $_SESSION['csrf']; ?>');
+            
+            try {
+                const res = await fetch('/abonos/eliminar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al eliminar');
+                }
+            } catch (err) {
+                alert('Error de conexión');
+            }
+        });
+    });
+});
+</script>

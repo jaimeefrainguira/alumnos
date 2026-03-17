@@ -115,7 +115,7 @@ final class Abono extends Model
     public function detailsByAlumno(int $alumnoId, int $anio): array
     {
         $stmt = $this->db->prepare(
-            'SELECT mes, valor, fecha_abono
+            'SELECT id, mes, valor, fecha_abono
              FROM abonos
              WHERE alumno_id = :alumno_id AND ((anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6))
              ORDER BY CASE WHEN mes >= 9 THEN mes - 12 ELSE mes END ASC, fecha_abono ASC, id ASC'
@@ -132,12 +132,40 @@ final class Abono extends Model
             $grouped[$monthNumber]['mes_numero'] = $monthNumber;
             $grouped[$monthNumber]['mes_nombre'] = self::MONTHS[$monthNumber] ?? (string) $monthNumber;
             $grouped[$monthNumber]['items'][] = [
+                'id' => (int) $row['id'],
                 'valor' => (float) $row['valor'],
                 'fecha_abono' => $row['fecha_abono'],
             ];
         }
 
         return array_values($grouped);
+    }
+
+    public function find(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM abonos WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE abonos 
+             SET valor = :valor, fecha_abono = :fecha_abono 
+             WHERE id = :id'
+        );
+        return $stmt->execute([
+            'id' => $id,
+            'valor' => $data['valor'],
+            'fecha_abono' => $data['fecha_abono'],
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM abonos WHERE id = :id');
+        return $stmt->execute(['id' => $id]);
     }
     public function deleteByAlumno(int $alumnoId): bool
     {

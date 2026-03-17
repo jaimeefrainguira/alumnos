@@ -52,6 +52,8 @@ $router->post('/alumnos', [AlumnoController::class, 'store']);
 $router->post('/alumnos/editar', [AlumnoController::class, 'edit']);
 $router->post('/alumnos/eliminar', [AlumnoController::class, 'delete']);
 $router->post('/abonos', [AbonoController::class, 'store']);
+$router->post('/abonos/editar', [AbonoController::class, 'update']);
+$router->post('/abonos/eliminar', [AbonoController::class, 'delete']);
 $router->get('/abonos/historial', [AbonoController::class, 'history']);
 $router->get('/cuotas', [CuotaController::class, 'index']);
 $router->post('/cuotas', [CuotaController::class, 'store']);
