@@ -15,17 +15,28 @@ final class Cuota extends Model
     {
         $yearColumn = $this->resolveYearColumn();
         $amountColumn = $this->resolveAmountColumn();
+        $cols = $this->getTableColumns();
+        $hasMonth = in_array('mes', $cols, true);
 
-        $stmt = $this->db->prepare(sprintf(
-            'SELECT mes, %s AS valor FROM cuotas WHERE %s = :anio',
-            $amountColumn,
-            $yearColumn
-        ));
+        $sql = $hasMonth 
+            ? sprintf('SELECT mes, %s AS valor FROM cuotas WHERE %s = :anio', $amountColumn, $yearColumn)
+            : sprintf('SELECT %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $amountColumn, $yearColumn);
+
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['anio' => $year]);
 
+        $rows = $stmt->fetchAll();
         $cuotas = [];
-        foreach ($stmt->fetchAll() as $row) {
-            $cuotas[(int) $row['mes']] = (float) $row['valor'];
+
+        if ($hasMonth) {
+            foreach ($rows as $row) {
+                $cuotas[(int) $row['mes']] = (float) $row['valor'];
+            }
+        } elseif (count($rows) > 0) {
+            $valor = (float) $rows[0]['valor'];
+            for ($m = 1; $m <= 12; $m++) {
+                $cuotas[$m] = $valor;
+            }
         }
 
         return $cuotas;
@@ -35,22 +46,35 @@ final class Cuota extends Model
     {
         $yearColumn = $this->resolveYearColumn();
         $amountColumn = $this->resolveAmountColumn();
+        $cols = $this->getTableColumns();
+        $hasMonth = in_array('mes', $cols, true);
 
-        $stmt = $this->db->prepare(sprintf(
-            'SELECT id, %s AS anio, mes, %s AS valor FROM cuotas WHERE %s = :anio AND mes = :mes LIMIT 1',
-            $yearColumn,
-            $amountColumn,
-            $yearColumn
-        ));
-        $stmt->execute(['anio' => $year, 'mes' => $month]);
+        $sql = $hasMonth
+            ? sprintf('SELECT id, %s AS anio, mes, %s AS valor FROM cuotas WHERE %s = :anio AND mes = :mes LIMIT 1', $yearColumn, $amountColumn, $yearColumn)
+            : sprintf('SELECT id, %s AS anio, 1 AS mes, %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $yearColumn, $amountColumn, $yearColumn);
 
-        return $stmt->fetch() ?: null;
+        $stmt = $this->db->prepare($sql);
+        $params = ['anio' => $year];
+        if ($hasMonth) {
+            $params['mes'] = $month;
+        }
+        $stmt->execute($params);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
     }
 
     public function upsert(int $year, float $value): bool
     {
         $yearColumn = $this->resolveYearColumn();
         $amountColumn = $this->resolveAmountColumn();
+        $cols = $this->getTableColumns();
+
+        if (in_array('mes', $cols, true)) {
+            // Si el sistema ya soporta meses, el 'upsert' anual 
+            // tradicional lo guardamos en el mes 1 como backup o fallback
+            return $this->upsertMonth($year, 1, $value);
+        }
 
         $stmt = $this->db->prepare(sprintf(
             'INSERT INTO cuotas (%s, %s) VALUES (:anio, :valor)
@@ -68,6 +92,11 @@ final class Cuota extends Model
     {
         $yearColumn = $this->resolveYearColumn();
         $amountColumn = $this->resolveAmountColumn();
+        $cols = $this->getTableColumns();
+
+        if (!in_array('mes', $cols, true)) {
+            return $this->upsert($year, $value);
+        }
 
         $stmt = $this->db->prepare(sprintf(
             'INSERT INTO cuotas (%s, mes, %s) VALUES (:anio, :mes, :valor)
@@ -103,10 +132,29 @@ final class Cuota extends Model
         return $this->amountColumn;
     }
 
+    private function getTableColumns(): array
+    {
+        static $columns = null;
+        if ($columns !== null) {
+            return $columns;
+        }
+
+        try {
+            $stmt = $this->db->query('SHOW COLUMNS FROM cuotas');
+            $rows = $stmt->fetchAll();
+            $columns = array_map(static function (array $row): string {
+                return (string) ($row['Field'] ?? $row['field'] ?? '');
+            }, $rows);
+        } catch (\Throwable $e) {
+            $columns = [];
+        }
+
+        return $columns;
+    }
+
     private function firstExistingColumn(array $candidates): ?string
     {
-        $stmt = $this->db->query('SHOW COLUMNS FROM cuotas');
-        $columns = array_map(static fn (array $row): string => (string) ($row['Field'] ?? ''), $stmt->fetchAll());
+        $columns = $this->getTableColumns();
 
         foreach ($candidates as $candidate) {
             if (in_array($candidate, $columns, true)) {

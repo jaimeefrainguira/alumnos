@@ -58,4 +58,12 @@ $router->post('/cuotas', [CuotaController::class, 'store']);
 $router->get('/reportes/alumno', [ReporteController::class, 'alumnoPdf']);
 $router->get('/reportes/general', [ReporteController::class, 'generalPdf']);
 
-$router->dispatch($_SERVER['REQUEST_URI'] ?? '/', $_SERVER['REQUEST_METHOD'] ?? 'GET');
+try {
+    $router->dispatch($_SERVER['REQUEST_URI'] ?? '/', $_SERVER['REQUEST_METHOD'] ?? 'GET');
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo "<h1>ERROR 500 - Depuración</h1>";
+    echo "<p><strong>Mensaje:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<p><strong>Archivo:</strong> " . htmlspecialchars($e->getFile()) . " (Línea " . $e->getLine() . ")</p>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+}
