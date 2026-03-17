@@ -103,3 +103,30 @@
     </div>
   </div>
 </div>
+
+<!-- Modal para editar abono -->
+<div class="modal fade" id="editAbonoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title">Editar Abono</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAbonoForm">
+                    <input type="hidden" name="id" id="editAbonoId">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? ''); ?>">
+                    <div class="mb-2">
+                        <label class="form-label mb-0"><small>Fecha</small></label>
+                        <input type="date" class="form-control form-control-sm" name="fecha_abono" id="editAbonoFecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label mb-0"><small>Valor ($)</small></label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="valor" id="editAbonoValor" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary w-100">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

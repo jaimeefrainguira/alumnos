@@ -15,8 +15,10 @@
   if (!modalElement) return;
 
   const modal = new bootstrap.Modal(modalElement);
+  const editModal = new bootstrap.Modal(document.getElementById('editAbonoModal'));
   const historyList = document.getElementById('abonoHistory');
   const form = document.getElementById('abonoForm');
+  const editForm = document.getElementById('editAbonoForm');
 
   document.querySelectorAll('.payment-cell').forEach((button) => {
     button.addEventListener('click', async () => {
@@ -24,9 +26,11 @@
       const mes = button.dataset.mes;
       const anio = button.dataset.anio;
 
-      document.getElementById('formAlumnoId').value = alumnoId;
-      document.getElementById('formMes').value = mes;
-      document.getElementById('formAnio').value = anio;
+      if (document.getElementById('formAlumnoId')) {
+        document.getElementById('formAlumnoId').value = alumnoId;
+        document.getElementById('formMes').value = mes;
+        document.getElementById('formAnio').value = anio;
+      }
 
       const response = await fetch(`/abonos/historial?alumno_id=${alumnoId}&mes=${mes}&anio=${anio}`);
       const json = await response.json();
@@ -34,34 +38,83 @@
       historyList.innerHTML = '';
       json.data.forEach((item) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between';
-        li.innerHTML = `<span>${item.fecha_abono}</span><strong>$${Number(item.valor).toFixed(2)}</strong>`;
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        
+        let actions = '';
+        if (form) { // User is authenticated
+          actions = `
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary py-0 px-1 edit-btn" 
+                      data-id="${item.id}" data-valor="${item.valor}" data-fecha="${item.fecha_abono}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger py-0 px-1 delete-btn" data-id="${item.id}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          `;
+        }
+
+        li.innerHTML = `
+          <div>
+            <span>${item.fecha_abono}</span> - <strong>$${Number(item.valor).toFixed(2)}</strong>
+          </div>
+          ${actions}
+        `;
         historyList.appendChild(li);
       });
 
       if (json.data.length === 0) {
         historyList.innerHTML = '<li class="list-group-item">Sin abonos registrados.</li>';
       }
+
+      // Add listeners to new buttons
+      historyList.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('editAbonoId').value = btn.dataset.id;
+          document.getElementById('editAbonoValor').value = btn.dataset.valor;
+          document.getElementById('editAbonoFecha').value = btn.dataset.fecha;
+          modal.hide();
+          editModal.show();
+        });
+      });
+
+      historyList.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Seguro que deseas eliminar este abono?')) return;
+          const formData = new FormData();
+          formData.append('id', btn.dataset.id);
+          formData.append('csrf', document.querySelector('#paymentModal [name="csrf"]').value);
+          
+          const res = await fetch('/abonos/eliminar', { method: 'POST', body: formData });
+          const data = await res.json();
+          if (data.ok) location.reload(); else alert(data.message);
+        });
+      });
+
       modal.show();
     });
   });
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const payload = new FormData(form);
-
-    const response = await fetch('/abonos', {
-      method: 'POST',
-      body: payload
+  if (form) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = new FormData(form);
+      const response = await fetch('/abonos', { method: 'POST', body: payload });
+      const json = await response.json();
+      if (json.ok) window.location.reload(); else alert(json.message || 'Error al registrar abono');
     });
+  }
 
-    const json = await response.json();
-    if (json.ok) {
-      window.location.reload();
-    } else {
-      alert(json.message || 'Error al registrar abono');
-    }
-  });
+  if (editForm) {
+    editForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = new FormData(editForm);
+      const response = await fetch('/abonos/editar', { method: 'POST', body: payload });
+      const json = await response.json();
+      if (json.ok) window.location.reload(); else alert(json.message || 'Error al actualizar abono');
+    });
+  }
 })();
 
 (() => {
