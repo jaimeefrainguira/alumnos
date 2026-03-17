@@ -20,7 +20,7 @@ final class AlumnoController extends Controller
 
     public function index(): void
     {
-        $this->guard();
+        // No guard here to allow public view of the matrix
         $anio = (int) ($_GET['anio'] ?? date('Y'));
 
         $alumnos = (new Alumno())->all();

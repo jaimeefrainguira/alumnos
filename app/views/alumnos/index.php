@@ -3,15 +3,31 @@
     <h4>Matriz de pagos <?= $anio; ?></h4>
     <a class="btn btn-outline-primary" href="/reportes/general?anio=<?= $anio; ?>">Descargar PDF General</a>
 </div>
-<div class="card mb-4"><div class="card-body">
-<form method="post" action="/alumnos" class="row g-2">
-    <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
-    <div class="col-md-4"><input class="form-control" name="nombre" placeholder="Nombre" required></div>
-    <div class="col-md-3"><input class="form-control" name="telefono" placeholder="Teléfono"></div>
-    <div class="col-md-3"><input class="form-control" name="direccion" placeholder="Dirección"></div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">Crear alumno</button></div>
-    <div class="col-12"><small class="text-muted">El código del alumno se genera automáticamente.</small></div>
-</form></div></div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card"><div class="card-body py-2">
+            <label class="form-label mb-1"><small class="text-muted fw-bold">Filtrar por Año</small></label>
+            <form method="get" action="/alumnos" class="d-flex gap-1">
+                <input type="number" name="anio" class="form-control form-control-sm" value="<?= $anio; ?>" required>
+                <button class="btn btn-sm btn-primary">Ver</button>
+            </form>
+        </div></div>
+    </div>
+    <?php if (isset($_SESSION['auth'])): ?>
+    <div class="col-md-9">
+        <div class="card"><div class="card-body py-2">
+            <label class="form-label mb-1"><small class="text-muted fw-bold">Registrar Nuevo Alumno</small></label>
+            <form method="post" action="/alumnos" class="row g-2">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
+                <div class="col-md-4"><input class="form-control form-control-sm" name="nombre" placeholder="Nombre completo" required></div>
+                <div class="col-md-3"><input class="form-control form-control-sm" name="telefono" placeholder="Teléfono"></div>
+                <div class="col-md-3"><input class="form-control form-control-sm" name="direccion" placeholder="Dirección"></div>
+                <div class="col-md-2"><button class="btn btn-sm btn-success w-100">Crear Alumno</button></div>
+            </form>
+        </div></div>
+    </div>
+    <?php endif; ?>
+</div>
 
 <div class="table-responsive">
 <table class="table table-bordered table-sm align-middle payment-matrix">
@@ -60,6 +76,7 @@
           <!-- Populated by JS -->
         </ul>
         
+        <?php if (isset($_SESSION['auth'])): ?>
         <h6 class="mb-3">Añadir Nuevo Abono</h6>
         <form id="abonoForm">
           <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? ''); ?>">
@@ -78,6 +95,11 @@
             <button type="submit" class="btn btn-primary">Registrar Abono</button>
           </div>
         </form>
+        <?php else: ?>
+        <div class="alert alert-info py-2 mb-0">
+            <small>Inicie sesión para registrar abonos.</small>
+        </div>
+        <?php endif; ?>
       </div>
     </div>
   </div>

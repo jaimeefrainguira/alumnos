@@ -13,7 +13,12 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
         <h4 class="mb-1">Detalle de pagos de <?= htmlspecialchars($alumno['nombre']); ?></h4>
         <small class="text-muted">Código: <?= htmlspecialchars($alumno['codigo']); ?> · Año: <?= (int) $anio; ?></small>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center">
+        <form method="get" action="/alumnos/ver" class="d-flex gap-1">
+            <input type="hidden" name="id" value="<?= (int) $alumno['id']; ?>">
+            <input type="number" name="anio" class="form-control form-control-sm" value="<?= (int) $anio; ?>" style="width: 80px;">
+            <button class="btn btn-sm btn-outline-secondary">Ver año</button>
+        </form>
         <a class="btn btn-outline-primary" href="/reportes/alumno?id=<?= (int) $alumno['id']; ?>&anio=<?= (int) $anio; ?>">PDF alumno</a>
         <a class="btn btn-outline-secondary" href="/alumnos?anio=<?= (int) $anio; ?>">Volver</a>
     </div>

@@ -44,7 +44,6 @@ final class AbonoController extends Controller
 
     public function history(): void
     {
-        $this->guard();
         $alumnoId = (int) ($_GET['alumno_id'] ?? 0);
         $mes = (int) ($_GET['mes'] ?? 0);
         $anio = (int) ($_GET['anio'] ?? date('Y'));

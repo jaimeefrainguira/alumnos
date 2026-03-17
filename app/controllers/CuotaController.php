@@ -20,9 +20,8 @@ final class CuotaController extends Controller
     {
         $this->guard();
         $year = (int) ($_GET['anio'] ?? date('Y'));
-        $month = (int) ($_GET['mes'] ?? date('n'));
-        $cuota = (new Cuota())->getByYearMonth($year, $month);
-        $this->view('cuotas/index', compact('year', 'cuota'));
+        $cuotas = (new Cuota())->getByYear($year);
+        $this->view('cuotas/index', compact('year', 'cuotas'));
     }
 
     public function store(): void

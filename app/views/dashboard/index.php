@@ -1,3 +1,10 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5>Resumen General</h5>
+    <form method="get" action="/dashboard" class="d-flex gap-2">
+        <input type="number" name="anio" class="form-control form-control-sm" value="<?= $anio; ?>" style="width: 100px;">
+        <button class="btn btn-sm btn-primary">Filtrar</button>
+    </form>
+</div>
 <div class="row g-3 mb-3">
     <div class="col-md-3"><div class="card p-3"><small>Total pagos</small><h4>$<?= number_format($totalPayments, 2); ?></h4></div></div>
     <div class="col-md-3"><div class="card p-3"><small>Pagos del día</small><h4>$<?= number_format($paymentsToday, 2); ?></h4></div></div>

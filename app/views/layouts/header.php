@@ -13,9 +13,9 @@
         <a class="navbar-brand" href="/">Colegio Pagos</a>
         <div class="collapse navbar-collapse show">
             <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/alumnos">Matriz de Pagos</a></li>
                 <?php if (isset($_SESSION['auth'])): ?>
                     <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/alumnos">Alumnos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuotas">Cuotas</a></li>
                     <li class="nav-item"><a class="nav-link" href="/reportes/general">PDF General</a></li>
                 <?php endif; ?>

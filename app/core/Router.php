@@ -25,7 +25,16 @@ final class Router
 
     public function dispatch(string $uri, string $method): void
     {
-        $path = rtrim(parse_url($uri, PHP_URL_PATH) ?: '/', '/') ?: '/';
+        $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        
+        // Detect base path (e.g. /alumnos) if index.php is in a subfolder
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $baseDir = str_replace('\\', '/', dirname($scriptName));
+        if ($baseDir !== '/' && str_starts_with($path, $baseDir)) {
+            $path = substr($path, strlen($baseDir));
+        }
+
+        $path = rtrim($path, '/') ?: '/';
         $action = $this->routes[$method][$path] ?? null;
 
         if ($action === null) {
