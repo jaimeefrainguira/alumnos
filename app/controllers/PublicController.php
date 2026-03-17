@@ -13,7 +13,7 @@ final class PublicController extends Controller
 {
     public function home(): void
     {
-        $anio = (int) date('Y');
+        $anio = (int) $this->getAcademicYear();
         $term = '';
         $results = $this->buildResults($term, $anio);
         $totals = (new Abono())->totalsMatrix($anio);
@@ -25,7 +25,7 @@ final class PublicController extends Controller
     public function search(): void
     {
         $term = trim($_GET['q'] ?? '');
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
         $results = $this->buildResults($term, $anio);
         $totals = (new Abono())->totalsMatrix($anio);
         $cuotas = (new Cuota())->getByYear($anio);

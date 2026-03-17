@@ -38,4 +38,16 @@ abstract class Controller
     {
         return isset($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], (string) $token);
     }
+
+    protected function getAcademicYear(): int
+    {
+        $year = (int) date('Y');
+        $month = (int) date('n');
+        // Ciclo Sierra: Sep-Jun. Si estamos en meses 1-8, el ciclo empezó el año pasado. 
+        // (En Septiembre empieza el año académico N)
+        if ($month <= 8) {
+            $year--;
+        }
+        return $year;
+    }
 }

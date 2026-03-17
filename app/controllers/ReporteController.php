@@ -22,7 +22,7 @@ final class ReporteController extends Controller
     public function dashboard(): void
     {
         $this->guard();
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
 
         $abonoModel = new Abono();
         $alumnoModel = new Alumno();
@@ -46,7 +46,7 @@ final class ReporteController extends Controller
     public function alumnoPdf(): void
     {
         $alumnoId = (int) ($_GET['id'] ?? 0);
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
 
         $alumno = (new Alumno())->find($alumnoId);
         if ($alumno === null) {
@@ -63,7 +63,7 @@ final class ReporteController extends Controller
     public function generalPdf(): void
     {
         $this->guard();
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
 
         $alumnos = (new Alumno())->all();
         $totals = (new Abono())->totalsMatrix($anio);

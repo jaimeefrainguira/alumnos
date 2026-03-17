@@ -21,7 +21,7 @@ final class AlumnoController extends Controller
     public function index(): void
     {
         // No guard here to allow public view of the matrix
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
 
         $alumnos = (new Alumno())->all();
         $cuotas = (new Cuota())->getByYear($anio);
@@ -34,7 +34,7 @@ final class AlumnoController extends Controller
     {
         $this->guard();
         $alumnoId = (int) ($_GET['id'] ?? 0);
-        $anio = (int) ($_GET['anio'] ?? date('Y'));
+        $anio = (int) ($_GET['anio'] ?? $this->getAcademicYear());
 
         $alumno = (new Alumno())->find($alumnoId);
         if ($alumno === null) {
@@ -109,10 +109,10 @@ final class AlumnoController extends Controller
 
         $id = (int) ($_POST['id'] ?? 0);
         
-        // El framework no dice nada sobre abonos cascada, pero el usuario pidió que se borrasen los abonos, 
-        // normalmente esto lo hace una FK con ON DELETE CASCADE pero lo hacemos explícito para asegurar.
-        // Vamos a la segura y asumimos que está configurado como delete cascade, 
-        // y solo eliminamos el alumno
+        // Primero eliminamos los abonos para evitar errores de integridad
+        (new Abono())->deleteByAlumno($id);
+        
+        // Luego eliminamos el alumno
         (new Alumno())->delete($id);
         
         $_SESSION['flash_ok'] = 'Alumno eliminado correctamente.';

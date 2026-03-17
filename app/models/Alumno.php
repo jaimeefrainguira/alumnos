@@ -16,18 +16,26 @@ final class Alumno extends Model
 
     public function create(array $data): bool
     {
-        $codigo = $this->nextCode();
-
-        $stmt = $this->db->prepare(
-            'INSERT INTO alumnos (codigo, nombre, telefono, direccion) VALUES (:codigo, :nombre, :telefono, :direccion)'
-        );
-
-        return $stmt->execute([
-            'codigo' => $codigo,
+        $cols = $this->getTableColumns();
+        $fields = ['nombre', 'telefono', 'direccion'];
+        $params = [
             'nombre' => $data['nombre'],
             'telefono' => $data['telefono'],
             'direccion' => $data['direccion'],
-        ]);
+        ];
+
+        if (in_array('codigo', $cols, true)) {
+            $fields[] = 'codigo';
+            $params['codigo'] = $this->nextCode();
+        }
+
+        $sql = sprintf(
+            'INSERT INTO alumnos (%s) VALUES (%s)',
+            implode(', ', $fields),
+            implode(', ', array_map(fn($f) => ':' . $f, $fields))
+        );
+
+        return $this->db->prepare($sql)->execute($params);
     }
 
     public function update(int $id, array $data): bool
@@ -130,10 +138,26 @@ final class Alumno extends Model
 
     private function nextCode(): string
     {
-        $stmt = $this->db->query("SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 5) AS UNSIGNED)), 0) AS max_codigo FROM alumnos WHERE codigo LIKE 'ALU-%'");
-        $row = $stmt->fetch();
-        $next = ((int) ($row['max_codigo'] ?? 0)) + 1;
+        try {
+            $stmt = $this->db->query("SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 5) AS UNSIGNED)), 0) AS max_codigo FROM alumnos WHERE codigo LIKE 'ALU-%'");
+            $row = $stmt->fetch();
+            $next = ((int) ($row['max_codigo'] ?? 0)) + 1;
+            return sprintf('ALU-%03d', $next);
+        } catch (\Throwable $e) {
+            return uniqid('ALU-');
+        }
+    }
 
-        return sprintf('ALU-%03d', $next);
+    private function getTableColumns(): array
+    {
+        static $columns = null;
+        if ($columns !== null) return $columns;
+        try {
+            $stmt = $this->db->query('SHOW COLUMNS FROM alumnos');
+            $columns = array_map(fn($c) => (string)($c['Field'] ?? $c['field']), $stmt->fetchAll());
+        } catch (\Throwable $e) { 
+            $columns = []; 
+        }
+        return $columns;
     }
 }

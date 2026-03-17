@@ -19,7 +19,7 @@ final class CuotaController extends Controller
     public function index(): void
     {
         $this->guard();
-        $year = (int) ($_GET['anio'] ?? date('Y'));
+        $year = (int) ($_GET['anio'] ?? $this->getAcademicYear());
         $cuotas = (new Cuota())->getByYear($year);
         $this->view('cuotas/index', compact('year', 'cuotas'));
     }
@@ -32,7 +32,7 @@ final class CuotaController extends Controller
             exit('CSRF inválido');
         }
 
-        $year = (int) ($_POST['anio'] ?? date('Y'));
+        $year = (int) ($_POST['anio'] ?? $this->getAcademicYear());
         $month = (int) ($_POST['mes'] ?? date('n'));
         
         $dbYear = $year;

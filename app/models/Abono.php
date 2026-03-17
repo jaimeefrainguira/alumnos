@@ -139,4 +139,9 @@ final class Abono extends Model
 
         return array_values($grouped);
     }
+    public function deleteByAlumno(int $alumnoId): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM abonos WHERE alumno_id = :alumno_id');
+        return $stmt->execute(['alumno_id' => $alumnoId]);
+    }
 }
