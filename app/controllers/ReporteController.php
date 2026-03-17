@@ -55,8 +55,7 @@ final class ReporteController extends Controller
         }
 
         $totals = (new Abono())->totalsByAlumno($alumnoId, $anio);
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
 
         require __DIR__ . '/../../pdf/alumno.php';
     }

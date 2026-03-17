@@ -82,9 +82,8 @@ final class Alumno extends Model
             return [];
         }
 
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
-        if ($valorCuota <= 0) {
+        $cuotas = (new Cuota())->getByYear($anio);
+        if ($cuotas === []) {
             return [];
         }
 
@@ -102,23 +101,16 @@ final class Alumno extends Model
         }
 
         $meses = [
-            1 => 'Enero',
-            2 => 'Febrero',
-            3 => 'Marzo',
-            4 => 'Abril',
-            5 => 'Mayo',
-            6 => 'Junio',
-            7 => 'Julio',
-            8 => 'Agosto',
-            9 => 'Septiembre',
-            10 => 'Octubre',
-            11 => 'Noviembre',
-            12 => 'Diciembre',
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
         ];
 
         $morosos = [];
         foreach ($alumnos as $alumno) {
-            for ($mes = 1; $mes <= 12; $mes++) {
+            foreach ($cuotas as $mes => $valorCuota) {
+                if ($valorCuota <= 0) continue;
+
                 $pagado = (float) ($pagos[(int) $alumno['id']][$mes] ?? 0);
                 $pendiente = $valorCuota - $pagado;
 

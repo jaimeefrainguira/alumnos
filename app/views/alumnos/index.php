@@ -27,7 +27,8 @@
     </td>
     <?php foreach ($meses as $numero => $nombreMes):
         $paid = (float) ($totals[$alumno['id']][$numero] ?? 0);
-        $status = $paid >= $valorCuota && $valorCuota > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');
+        $quota = (float) ($cuotas[$numero] ?? 0);
+        $status = $paid >= $quota && $quota > 0 ? 'paid' : ($paid > 0 ? 'partial' : 'pending');
     ?>
         <td>
             <button class="btn btn-sm w-100 status-<?= $status; ?> payment-cell"

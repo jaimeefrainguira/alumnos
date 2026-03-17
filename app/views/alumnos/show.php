@@ -1,7 +1,12 @@
 <?php
 $meses = [1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre'];
 $totalPagado = array_sum($totals);
-$saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
+$totalEsperado = array_sum($cuotas);
+$saldoPendiente = max($totalEsperado - $totalPagado, 0);
+
+// Para mostrar una "cuota base" o indicar que es variable
+$cuotasUnicas = array_unique($cuotas);
+$displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUnicas), 2) : 'Variable';
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -16,7 +21,7 @@ $saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
 
 <div class="row g-3 mb-3">
     <div class="col-md-4"><div class="card p-3"><small>Total pagado</small><h5>$<?= number_format((float) $totalPagado, 2); ?></h5></div></div>
-    <div class="col-md-4"><div class="card p-3"><small>Cuota mensual</small><h5>$<?= number_format((float) $valorCuota, 2); ?></h5></div></div>
+    <div class="col-md-4"><div class="card p-3"><small>Cuota mensual</small><h5><?= $displayCuota; ?></h5></div></div>
     <div class="col-md-4"><div class="card p-3"><small>Saldo pendiente</small><h5>$<?= number_format((float) $saldoPendiente, 2); ?></h5></div></div>
 </div>
 

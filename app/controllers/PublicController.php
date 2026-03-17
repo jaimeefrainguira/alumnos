@@ -17,10 +17,9 @@ final class PublicController extends Controller
         $term = '';
         $results = $this->buildResults($term, $anio);
         $totals = (new Abono())->totalsMatrix($anio);
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
 
-        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'valorCuota'));
+        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'cuotas'));
     }
 
     public function search(): void
@@ -29,10 +28,9 @@ final class PublicController extends Controller
         $anio = (int) ($_GET['anio'] ?? date('Y'));
         $results = $this->buildResults($term, $anio);
         $totals = (new Abono())->totalsMatrix($anio);
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
 
-        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'valorCuota'));
+        $this->view('public/search', compact('results', 'term', 'anio', 'totals', 'cuotas'));
     }
 
     private function buildResults(string $term, int $anio): array
@@ -41,12 +39,11 @@ final class PublicController extends Controller
         $results = $term === '' ? $alumnoModel->all() : $alumnoModel->search($term);
 
         $totals = (new Abono())->totalsMatrix($anio);
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
+        $expected = array_sum($cuotas);
 
         foreach ($results as &$result) {
             $paid = array_sum($totals[(int) $result['id']] ?? []);
-            $expected = $valorCuota * 12;
             $result['estado'] = $paid >= $expected && $expected > 0 ? 'Pagado' : ($paid > 0 ? 'Parcial' : 'Pendiente');
         }
         unset($result);

@@ -11,7 +11,8 @@ $meses = [
     9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
 ];
 $totalPagado = array_sum($totals);
-$saldoPendiente = max(($valorCuota * 12) - $totalPagado, 0);
+$totalEsperado = array_sum($cuotas);
+$saldoPendiente = max($totalEsperado - $totalPagado, 0);
 
 $html = '<h2>Reporte de alumno</h2>';
 $html .= '<p><strong>Alumno:</strong> ' . htmlspecialchars($alumno['nombre']) . '</p>';

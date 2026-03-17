@@ -19,8 +19,10 @@ CREATE TABLE alumnos (
 
 CREATE TABLE cuotas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    anio INT NOT NULL UNIQUE,
-    valor DECIMAL(10,2) NOT NULL
+    anio INT NOT NULL,
+    mes INT NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    UNIQUE KEY idx_cuota_anio_mes (anio, mes)
 );
 
 CREATE TABLE abonos (
@@ -37,7 +39,10 @@ CREATE TABLE abonos (
 INSERT INTO usuarios (usuario, password, rol)
 VALUES ('admin', '$2y$12$R2D0Da3BrfU3SES1gKDFnufRVQrZe77/A/OwTgGq3YBUu4YkEoHku', 'admin');
 
-INSERT INTO cuotas (anio, valor) VALUES (2026, 30.00);
+INSERT INTO cuotas (anio, mes, valor) VALUES 
+(2026, 1, 30.00),
+(2026, 2, 35.00),
+(2026, 3, 30.00);
 
 INSERT INTO alumnos (codigo, nombre, telefono, direccion) VALUES
 ('ALU-001', 'Juan Pérez', '0999999991', 'Av. Central 123'),

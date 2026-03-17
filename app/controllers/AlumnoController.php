@@ -24,11 +24,10 @@ final class AlumnoController extends Controller
         $anio = (int) ($_GET['anio'] ?? date('Y'));
 
         $alumnos = (new Alumno())->all();
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
         $totals = (new Abono())->totalsMatrix($anio);
 
-        $this->view('alumnos/index', compact('alumnos', 'totals', 'anio', 'valorCuota'));
+        $this->view('alumnos/index', compact('alumnos', 'totals', 'anio', 'cuotas'));
     }
 
     public function show(): void
@@ -46,10 +45,9 @@ final class AlumnoController extends Controller
         $abonoModel = new Abono();
         $detallePagos = $abonoModel->detailsByAlumno($alumnoId, $anio);
         $totals = $abonoModel->totalsByAlumno($alumnoId, $anio);
-        $cuota = (new Cuota())->getByYear($anio);
-        $valorCuota = (float) ($cuota['valor'] ?? 0);
+        $cuotas = (new Cuota())->getByYear($anio);
 
-        $this->view('alumnos/show', compact('alumno', 'anio', 'detallePagos', 'totals', 'valorCuota'));
+        $this->view('alumnos/show', compact('alumno', 'anio', 'detallePagos', 'totals', 'cuotas'));
     }
 
     public function store(): void

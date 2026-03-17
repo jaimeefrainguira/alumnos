@@ -11,18 +11,38 @@ final class Cuota extends Model
     private ?string $yearColumn = null;
     private ?string $amountColumn = null;
 
-    public function getByYear(int $year): ?array
+    public function getByYear(int $year): array
     {
         $yearColumn = $this->resolveYearColumn();
         $amountColumn = $this->resolveAmountColumn();
 
         $stmt = $this->db->prepare(sprintf(
-            'SELECT id, %s AS anio, %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1',
-            $yearColumn,
+            'SELECT mes, %s AS valor FROM cuotas WHERE %s = :anio',
             $amountColumn,
             $yearColumn
         ));
         $stmt->execute(['anio' => $year]);
+
+        $cuotas = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $cuotas[(int) $row['mes']] = (float) $row['valor'];
+        }
+
+        return $cuotas;
+    }
+
+    public function getByYearMonth(int $year, int $month): ?array
+    {
+        $yearColumn = $this->resolveYearColumn();
+        $amountColumn = $this->resolveAmountColumn();
+
+        $stmt = $this->db->prepare(sprintf(
+            'SELECT id, %s AS anio, mes, %s AS valor FROM cuotas WHERE %s = :anio AND mes = :mes LIMIT 1',
+            $yearColumn,
+            $amountColumn,
+            $yearColumn
+        ));
+        $stmt->execute(['anio' => $year, 'mes' => $month]);
 
         return $stmt->fetch() ?: null;
     }
@@ -42,6 +62,23 @@ final class Cuota extends Model
         ));
 
         return $stmt->execute(['anio' => $year, 'valor' => $value]);
+    }
+
+    public function upsertMonth(int $year, int $month, float $value): bool
+    {
+        $yearColumn = $this->resolveYearColumn();
+        $amountColumn = $this->resolveAmountColumn();
+
+        $stmt = $this->db->prepare(sprintf(
+            'INSERT INTO cuotas (%s, mes, %s) VALUES (:anio, :mes, :valor)
+             ON DUPLICATE KEY UPDATE %s = VALUES(%s)',
+            $yearColumn,
+            $amountColumn,
+            $amountColumn,
+            $amountColumn
+        ));
+
+        return $stmt->execute(['anio' => $year, 'mes' => $month, 'valor' => $value]);
     }
 
     private function resolveYearColumn(): string

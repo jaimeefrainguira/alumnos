@@ -20,7 +20,8 @@ final class CuotaController extends Controller
     {
         $this->guard();
         $year = (int) ($_GET['anio'] ?? date('Y'));
-        $cuota = (new Cuota())->getByYear($year);
+        $month = (int) ($_GET['mes'] ?? date('n'));
+        $cuota = (new Cuota())->getByYearMonth($year, $month);
         $this->view('cuotas/index', compact('year', 'cuota'));
     }
 
@@ -33,14 +34,15 @@ final class CuotaController extends Controller
         }
 
         $year = (int) ($_POST['anio'] ?? date('Y'));
+        $month = (int) ($_POST['mes'] ?? date('n'));
         $valor = (float) ($_POST['valor'] ?? 0);
         if ($valor <= 0) {
             $_SESSION['flash_error'] = 'Valor inválido.';
             $this->redirect('/cuotas');
         }
 
-        (new Cuota())->upsert($year, $valor);
+        (new Cuota())->upsertMonth($year, $month, $valor);
         $_SESSION['flash_ok'] = 'Cuota guardada.';
-        $this->redirect('/cuotas?anio=' . $year);
+        $this->redirect('/cuotas?anio=' . $year . '&mes=' . $month);
     }
 }
