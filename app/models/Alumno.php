@@ -67,10 +67,10 @@ final class Alumno extends Model
 
         $stmt = $this->db->prepare(
             'SELECT id, nombre, telefono FROM alumnos
-             WHERE nombre LIKE :term OR telefono LIKE :term
+             WHERE nombre LIKE :term1 OR telefono LIKE :term2
              ORDER BY nombre ASC LIMIT 50'
         );
-        $stmt->execute(['term' => '%' . $term . '%']);
+        $stmt->execute(['term1' => '%' . $term . '%', 'term2' => '%' . $term . '%']);
 
         return $stmt->fetchAll();
     }
