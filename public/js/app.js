@@ -5,7 +5,7 @@
     new Chart(chart, {
       type: 'bar',
       data: {
-        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+        labels: ['Sep','Oct','Nov','Dic','Ene','Feb','Mar','Abr','May','Jun'],
         datasets: [{ label: 'Ingresos', data, backgroundColor: '#0d6efd' }]
       }
     });

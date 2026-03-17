@@ -19,11 +19,11 @@ final class Cuota extends Model
         $hasMonth = in_array('mes', $cols, true);
 
         $sql = $hasMonth 
-            ? sprintf('SELECT mes, %s AS valor FROM cuotas WHERE %s = :anio', $amountColumn, $yearColumn)
+            ? sprintf('SELECT mes, %s AS valor FROM cuotas WHERE (%s = :anio AND mes >= 9) OR (%s = :anio_plus AND mes <= 6)', $amountColumn, $yearColumn, $yearColumn)
             : sprintf('SELECT %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $amountColumn, $yearColumn);
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['anio' => $year]);
+        $stmt->execute(['anio' => $year, 'anio_plus' => $year + 1]);
 
         $rows = $stmt->fetchAll();
         $cuotas = [];
@@ -50,11 +50,11 @@ final class Cuota extends Model
         $hasMonth = in_array('mes', $cols, true);
 
         $sql = $hasMonth
-            ? sprintf('SELECT id, %s AS anio, mes, %s AS valor FROM cuotas WHERE %s = :anio AND mes = :mes LIMIT 1', $yearColumn, $amountColumn, $yearColumn)
+            ? sprintf('SELECT id, %s AS anio, mes, %s AS valor FROM cuotas WHERE ((%s = :anio AND mes >= 9) OR (%s = :anio_plus AND mes <= 6)) AND mes = :mes LIMIT 1', $yearColumn, $amountColumn, $yearColumn, $yearColumn)
             : sprintf('SELECT id, %s AS anio, 1 AS mes, %s AS valor FROM cuotas WHERE %s = :anio LIMIT 1', $yearColumn, $amountColumn, $yearColumn);
 
         $stmt = $this->db->prepare($sql);
-        $params = ['anio' => $year];
+        $params = ['anio' => $year, 'anio_plus' => $year + 1];
         if ($hasMonth) {
             $params['mes'] = $month;
         }

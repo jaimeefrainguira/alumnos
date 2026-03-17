@@ -34,13 +34,19 @@ final class CuotaController extends Controller
 
         $year = (int) ($_POST['anio'] ?? date('Y'));
         $month = (int) ($_POST['mes'] ?? date('n'));
+        
+        $dbYear = $year;
+        if ($month >= 1 && $month <= 6) {
+            $dbYear = $year + 1;
+        }
+
         $valor = (float) ($_POST['valor'] ?? 0);
         if ($valor <= 0) {
             $_SESSION['flash_error'] = 'Valor inválido.';
-            $this->redirect('/cuotas');
+            $this->redirect('/cuotas?anio=' . $year);
         }
 
-        (new Cuota())->upsertMonth($year, $month, $valor);
+        (new Cuota())->upsertMonth($dbYear, $month, $valor);
         $_SESSION['flash_ok'] = 'Cuota guardada.';
         $this->redirect('/cuotas?anio=' . $year . '&mes=' . $month);
     }

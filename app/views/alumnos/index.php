@@ -1,6 +1,6 @@
-<?php $meses = [1=>'Ene',2=>'Feb',3=>'Mar',4=>'Abr',5=>'May',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dic']; ?>
+<?php $meses = [9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dic',1=>'Ene',2=>'Feb',3=>'Mar',4=>'Abr',5=>'May',6=>'Jun']; ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Matriz de pagos <?= $anio; ?></h4>
+    <h4>Matriz de pagos Ciclo <?= $anio; ?>-<?= $anio + 1; ?></h4>
     <a class="btn btn-outline-primary" href="/reportes/general?anio=<?= $anio; ?>">Descargar PDF General</a>
 </div>
 <div class="row g-3 mb-4">
@@ -38,8 +38,7 @@
     <td>
         <a href="/alumnos/ver?id=<?= (int) $alumno['id']; ?>&anio=<?= $anio; ?>" class="text-decoration-none fw-bold">
             <?= htmlspecialchars($alumno['nombre']); ?>
-        </a><br>
-        <small><?= htmlspecialchars($alumno['codigo']); ?></small>
+        </a>
     </td>
     <?php foreach ($meses as $numero => $nombreMes):
         $paid = (float) ($totals[$alumno['id']][$numero] ?? 0);

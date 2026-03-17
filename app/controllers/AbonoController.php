@@ -25,10 +25,19 @@ final class AbonoController extends Controller
             return;
         }
 
+        $mes = (int) ($_POST['mes'] ?? 0);
+        $anio = (int) ($_POST['anio'] ?? 0);
+
+        // Si el mes es de la segunda parte del ciclo (Ene-Jun), 
+        // almacenamos el año siguiente al que se envió (que es el año de inicio del ciclo)
+        if ($mes >= 1 && $mes <= 6) {
+            $anio++;
+        }
+
         $data = [
             'alumno_id' => (int) ($_POST['alumno_id'] ?? 0),
-            'mes' => (int) ($_POST['mes'] ?? 0),
-            'anio' => (int) ($_POST['anio'] ?? 0),
+            'mes' => $mes,
+            'anio' => $anio,
             'valor' => (float) ($_POST['valor'] ?? 0),
             'fecha_abono' => $_POST['fecha_abono'] ?? date('Y-m-d'),
         ];
@@ -48,7 +57,11 @@ final class AbonoController extends Controller
         $mes = (int) ($_GET['mes'] ?? 0);
         $anio = (int) ($_GET['anio'] ?? date('Y'));
 
-        $history = (new Abono())->monthHistory($alumnoId, $mes, $anio);
-        $this->json(['ok' => true, 'data' => $history]);
+        if ($mes >= 1 && $mes <= 6) {
+            $anio++;
+        }
+
+        $data = (new Abono())->monthHistory($alumnoId, $mes, $anio);
+        $this->json(['ok' => true, 'data' => $data]);
     }
 }

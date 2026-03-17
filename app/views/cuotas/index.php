@@ -1,4 +1,4 @@
-<?php $meses = [1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre']; ?>
+<?php $meses = [9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre',1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio']; ?>
 
 <div class="row g-4">
     <div class="col-md-4">
@@ -9,7 +9,7 @@
                     <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']); ?>">
                     
                     <div class="col-12">
-                        <label class="form-label mb-1 small text-muted">Año Lectivo</label>
+                        <label class="form-label mb-1 small text-muted">Inicio Ciclo (Año)</label>
                         <input class="form-control" type="number" name="anio" value="<?= $year; ?>" required>
                     </div>
 
@@ -45,10 +45,10 @@
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="mb-0">Listado de Cuotas - <?= $year; ?></h5>
+                    <h5 class="mb-0">Listado de Cuotas - Ciclo <?= $year; ?>/<?= $year + 1; ?></h5>
                     <div class="d-flex gap-2">
                         <form method="get" action="/cuotas" class="d-flex gap-1">
-                            <input type="number" name="anio" class="form-control form-control-sm" value="<?= $year; ?>" style="width: 80px;">
+                            <input type="number" name="anio" class="form-control form-control-sm" value="<?= $year; ?>" style="width: 80px;" title="Año inicial">
                             <button class="btn btn-sm btn-outline-secondary">Cambiar</button>
                         </form>
                     </div>

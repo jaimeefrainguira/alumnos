@@ -6,20 +6,19 @@ use App\Core\PdfFactory;
 
 $dompdf = PdfFactory::make();
 $meses = [
-    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+    9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic',
+    1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun'
 ];
-$html = '<h2>Reporte general de pagos ' . $anio . '</h2>';
-$html .= '<table border="1" cellspacing="0" cellpadding="4" width="100%"><tr><th>Alumno</th>';
-for ($m = 1; $m <= 12; $m++) {
-    $html .= '<th>' . $meses[$m] . '</th>';
+$html = '<h2>Reporte General de Pagos - Ciclo ' . (int)$anio . '-' . ((int)$anio + 1) . '</h2>';
+$html .= '<table border="1" cellspacing="0" cellpadding="4" width="100%" style="font-size:10px"><tr><th>Alumno</th>';
+foreach ($meses as $m => $label) {
+    $html .= '<th>' . $label . '</th>';
 }
 $html .= '</tr>';
 
 foreach ($alumnos as $alumno) {
     $html .= '<tr><td>' . htmlspecialchars($alumno['nombre']) . '</td>';
-    for ($m = 1; $m <= 12; $m++) {
+    foreach ($meses as $m => $label) {
         $amount = (float) ($totals[$alumno['id']][$m] ?? 0);
         $html .= '<td>$' . number_format($amount, 2) . '</td>';
     }

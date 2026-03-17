@@ -10,7 +10,7 @@ final class Alumno extends Model
 {
     public function all(): array
     {
-        $stmt = $this->db->query('SELECT id, codigo, nombre, telefono, direccion, fecha_registro FROM alumnos ORDER BY nombre ASC');
+        $stmt = $this->db->query('SELECT id, nombre, telefono, direccion FROM alumnos ORDER BY nombre ASC');
         return $stmt->fetchAll();
     }
 
@@ -58,8 +58,8 @@ final class Alumno extends Model
         }
 
         $stmt = $this->db->prepare(
-            'SELECT id, codigo, nombre, telefono FROM alumnos
-             WHERE nombre LIKE :term OR telefono LIKE :term OR codigo LIKE :term
+            'SELECT id, nombre, telefono FROM alumnos
+             WHERE nombre LIKE :term OR telefono LIKE :term
              ORDER BY nombre ASC LIMIT 50'
         );
         $stmt->execute(['term' => '%' . $term . '%']);
@@ -69,7 +69,7 @@ final class Alumno extends Model
 
     public function find(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT id, codigo, nombre, telefono, direccion FROM alumnos WHERE id = :id LIMIT 1');
+        $stmt = $this->db->prepare('SELECT id, nombre, telefono, direccion FROM alumnos WHERE id = :id LIMIT 1');
         $stmt->execute(['id' => $id]);
 
         return $stmt->fetch() ?: null;
@@ -90,10 +90,10 @@ final class Alumno extends Model
         $stmt = $this->db->prepare(
             'SELECT alumno_id, mes, SUM(valor) AS total
              FROM abonos
-             WHERE anio = :anio
+             WHERE (anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6)
              GROUP BY alumno_id, mes'
         );
-        $stmt->execute(['anio' => $anio]);
+        $stmt->execute(['anio' => $anio, 'anio_plus' => $anio + 1]);
 
         $pagos = [];
         foreach ($stmt->fetchAll() as $row) {
@@ -101,9 +101,8 @@ final class Alumno extends Model
         }
 
         $meses = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
             9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio'
         ];
 
         $morosos = [];

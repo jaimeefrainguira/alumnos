@@ -1,5 +1,5 @@
 <?php
-$meses = [1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre'];
+$meses = [9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre',1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio'];
 $totalPagado = array_sum($totals);
 $totalEsperado = array_sum($cuotas);
 $saldoPendiente = max($totalEsperado - $totalPagado, 0);
@@ -11,7 +11,7 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h4 class="mb-1">Detalle de pagos de <?= htmlspecialchars($alumno['nombre']); ?></h4>
-        <small class="text-muted">Código: <?= htmlspecialchars($alumno['codigo']); ?> · Año: <?= (int) $anio; ?></small>
+        <small class="text-muted">Ciclo Lectivo Sierra: <?= (int) $anio; ?> - <?= (int) $anio + 1; ?></small>
     </div>
     <div class="d-flex gap-2 align-items-center">
         <form method="get" action="/alumnos/ver" class="d-flex gap-1">
@@ -69,7 +69,7 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
             <table class="table table-sm align-middle">
                 <thead><tr><th>Mes</th><th>Total abonado</th><th>Detalle</th></tr></thead>
                 <tbody>
-                <?php for ($mes = 1; $mes <= 12; $mes++):
+                <?php foreach ($meses as $mes => $nombreMes):
                     $totalMes = (float) ($totals[$mes] ?? 0);
                 ?>
                     <tr>
@@ -93,7 +93,7 @@ $displayCuota = count($cuotasUnicas) === 1 ? '$' . number_format(reset($cuotasUn
                             <?php endif; ?>
                         </td>
                     </tr>
-                <?php endfor; ?>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

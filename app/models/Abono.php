@@ -9,18 +9,8 @@ use App\Core\Model;
 final class Abono extends Model
 {
     private const MONTHS = [
-        1 => 'Enero',
-        2 => 'Febrero',
-        3 => 'Marzo',
-        4 => 'Abril',
-        5 => 'Mayo',
-        6 => 'Junio',
-        7 => 'Julio',
-        8 => 'Agosto',
-        9 => 'Septiembre',
-        10 => 'Octubre',
-        11 => 'Noviembre',
-        12 => 'Diciembre',
+        9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+        1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio'
     ];
 
     public function create(array $data): bool
@@ -55,10 +45,10 @@ final class Abono extends Model
         $stmt = $this->db->prepare(
             'SELECT alumno_id, mes, SUM(valor) AS total
              FROM abonos
-             WHERE anio = :anio
+             WHERE (anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6)
              GROUP BY alumno_id, mes'
         );
-        $stmt->execute(['anio' => $anio]);
+        $stmt->execute(['anio' => $anio, 'anio_plus' => $anio + 1]);
 
         $totals = [];
         foreach ($stmt->fetchAll() as $row) {
@@ -73,14 +63,14 @@ final class Abono extends Model
         $stmt = $this->db->prepare(
             'SELECT mes, SUM(valor) AS total
              FROM abonos
-             WHERE anio = :anio
+             WHERE (anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6)
              GROUP BY mes
-             ORDER BY mes ASC'
+             ORDER BY CASE WHEN mes >= 9 THEN mes - 12 ELSE mes END ASC'
         );
-        $stmt->execute(['anio' => $anio]);
+        $stmt->execute(['anio' => $anio, 'anio_plus' => $anio + 1]);
 
         $rows = $stmt->fetchAll();
-        $result = array_fill(1, 12, 0.0);
+        $result = [9 => 0.0, 10 => 0.0, 11 => 0.0, 12 => 0.0, 1 => 0.0, 2 => 0.0, 3 => 0.0, 4 => 0.0, 5 => 0.0, 6 => 0.0];
         foreach ($rows as $row) {
             $result[(int) $row['mes']] = (float) $row['total'];
         }
@@ -90,8 +80,8 @@ final class Abono extends Model
 
     public function totalPayments(int $anio): float
     {
-        $stmt = $this->db->prepare('SELECT COALESCE(SUM(valor),0) AS total FROM abonos WHERE anio = :anio');
-        $stmt->execute(['anio' => $anio]);
+        $stmt = $this->db->prepare('SELECT COALESCE(SUM(valor),0) AS total FROM abonos WHERE (anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6)');
+        $stmt->execute(['anio' => $anio, 'anio_plus' => $anio + 1]);
 
         return (float) $stmt->fetch()['total'];
     }
@@ -109,12 +99,12 @@ final class Abono extends Model
         $stmt = $this->db->prepare(
             'SELECT mes, SUM(valor) total
              FROM abonos
-             WHERE alumno_id = :alumno_id AND anio = :anio
+             WHERE alumno_id = :alumno_id AND ((anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6))
              GROUP BY mes'
         );
-        $stmt->execute(['alumno_id' => $alumnoId, 'anio' => $anio]);
+        $stmt->execute(['alumno_id' => $alumnoId, 'anio' => $anio, 'anio_plus' => $anio + 1]);
 
-        $rows = array_fill(1, 12, 0.0);
+        $rows = [9 => 0.0, 10 => 0.0, 11 => 0.0, 12 => 0.0, 1 => 0.0, 2 => 0.0, 3 => 0.0, 4 => 0.0, 5 => 0.0, 6 => 0.0];
         foreach ($stmt->fetchAll() as $row) {
             $rows[(int) $row['mes']] = (float) $row['total'];
         }
@@ -127,12 +117,13 @@ final class Abono extends Model
         $stmt = $this->db->prepare(
             'SELECT mes, valor, fecha_abono
              FROM abonos
-             WHERE alumno_id = :alumno_id AND anio = :anio
-             ORDER BY mes ASC, fecha_abono ASC, id ASC'
+             WHERE alumno_id = :alumno_id AND ((anio = :anio AND mes >= 9) OR (anio = :anio_plus AND mes <= 6))
+             ORDER BY CASE WHEN mes >= 9 THEN mes - 12 ELSE mes END ASC, fecha_abono ASC, id ASC'
         );
         $stmt->execute([
             'alumno_id' => $alumnoId,
             'anio' => $anio,
+            'anio_plus' => $anio + 1,
         ]);
 
         $grouped = [];

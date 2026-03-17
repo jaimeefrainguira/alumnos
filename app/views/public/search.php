@@ -1,4 +1,4 @@
-<?php $meses = [1=>'Ene',2=>'Feb',3=>'Mar',4=>'Abr',5=>'May',6=>'Jun',7=>'Jul',8=>'Ago',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dic']; ?>
+<?php $meses = [9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dic',1=>'Ene',2=>'Feb',3=>'Mar',4=>'Abr',5=>'May',6=>'Jun']; ?>
 <div class="row justify-content-center">
     <div class="col-md-10">
         <div class="card mb-3">
@@ -14,14 +14,14 @@
 
         <div class="card">
             <div class="card-body">
-                <h5 class="mb-3">Matriz de pagos <?= (int) ($anio ?? date('Y')); ?></h5>
+                <h5 class="mb-3">Matriz de pagos Ciclo <?= (int) ($anio ?? date('Y')); ?>-<?= (int) ($anio ?? date('Y')) + 1; ?></h5>
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm align-middle payment-matrix mb-0">
                         <thead><tr><th>Alumno</th><?php foreach ($meses as $m): ?><th><?= $m; ?></th><?php endforeach; ?></tr></thead>
                         <tbody>
                         <?php foreach (($results ?? []) as $alumno): ?>
                             <tr>
-                                <td><?= htmlspecialchars($alumno['nombre']); ?><br><small><?= htmlspecialchars($alumno['codigo']); ?></small></td>
+                                <td><?= htmlspecialchars($alumno['nombre']); ?></td>
                                 <?php foreach ($meses as $numero => $nombreMes):
                                     $paid = (float) (($totals[(int) $alumno['id']][$numero] ?? 0));
                                     $quota = (float) ($cuotas[$numero] ?? 0);
