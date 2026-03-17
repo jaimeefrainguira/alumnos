@@ -67,6 +67,7 @@ final class ReporteController extends Controller
 
         $alumnos = (new Alumno())->all();
         $totals = (new Abono())->totalsMatrix($anio);
+        $cuotas = (new Cuota())->getByYear($anio);
 
         require __DIR__ . '/../../pdf/general.php';
     }

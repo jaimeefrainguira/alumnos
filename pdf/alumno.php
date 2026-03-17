@@ -13,20 +13,74 @@ $totalPagado = array_sum($totals);
 $totalEsperado = array_sum($cuotas);
 $saldoPendiente = max($totalEsperado - $totalPagado, 0);
 
-$html = '<h2 style="text-align:center">Reporte de Pagos</h2>';
-$html .= '<p><strong>Alumno:</strong> ' . htmlspecialchars($alumno['nombre']) . '</p>';
-$html .= '<p><strong>Ciclo Lectivo:</strong> ' . (int)$anio . ' - ' . ((int)$anio + 1) . '</p>';
-$html .= '<table border="1" cellspacing="0" cellpadding="6" width="100%">
-            <tr style="background:#f2f2f2"><th>Mes</th><th>Pagado</th></tr>';
+$html = '
+<style>
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
+    h2 { text-align: center; color: #0056b3; font-size: 24px; margin-bottom: 20px; }
+    .header-info { margin-bottom: 20px; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 16px; }
+    th { background-color: #f2f2f2; color: #333; font-weight: bold; padding: 12px; border: 1px solid #ddd; text-align: left; }
+    td { padding: 10px; border: 1px solid #ddd; }
+    .status-paid { background-color: #d4edda; color: #155724; font-weight: bold; text-align: center; }
+    .status-pending { background-color: #f8d7da; color: #721c24; font-weight: bold; text-align: center; }
+    .status-partial { background-color: #fff3cd; color: #856404; font-weight: bold; text-align: center; }
+    .footer-totals { font-size: 18px; margin-top: 20px; border-top: 2px solid #333; padding-top: 10px; }
+    .footer-totals p { margin: 5px 0; }
+</style>
+
+<h2>Reporte de Pagos del Alumno</h2>
+
+<div class="header-info">
+    <p><strong>Alumno:</strong> ' . htmlspecialchars($alumno['nombre']) . '</p>
+    <p><strong>Ciclo Lectivo:</strong> ' . (int)$anio . ' - ' . ((int)$anio + 1) . '</p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Mes</th>
+            <th style="text-align: right;">Abonado</th>
+            <th style="text-align: center;">Estado</th>
+        </tr>
+    </thead>
+    <tbody>';
+
 foreach ($meses as $m => $nombreMes) {
-    $html .= '<tr><td>' . $nombreMes . '</td><td>$' . number_format((float) ($totals[$m] ?? 0), 2) . '</td></tr>';
+    $paid = (float) ($totals[$m] ?? 0);
+    $quota = (float) ($cuotas[$m] ?? 0);
+    
+    if ($quota <= 0) {
+        $statusClass = '';
+        $statusText = 'N/A';
+    } elseif ($paid >= $quota) {
+        $statusClass = 'status-paid';
+        $statusText = 'PAGADO';
+    } elseif ($paid > 0) {
+        $statusClass = 'status-partial';
+        $statusText = 'PARCIAL';
+    } else {
+        $statusClass = 'status-pending';
+        $statusText = 'PENDIENTE';
+    }
+
+    $html .= '<tr>
+                <td>' . $nombreMes . '</td>
+                <td style="text-align: right;">$' . number_format($paid, 2) . '</td>
+                <td class="' . $statusClass . '">' . $statusText . '</td>
+              </tr>';
 }
-$html .= '</table>';
-$html .= '<p><strong>Total pagado:</strong> $' . number_format((float) $totalPagado, 2) . '</p>';
-$html .= '<p><strong>Saldo pendiente:</strong> $' . number_format((float) $saldoPendiente, 2) . '</p>';
+
+$html .= '
+    </tbody>
+</table>
+
+<div class="footer-totals">
+    <p><strong>Total pagado:</strong> <span style="color: #155724;">$' . number_format((float) $totalPagado, 2) . '</span></p>
+    <p><strong>Saldo pendiente:</strong> <span style="color: #721c24;">$' . number_format((float) $saldoPendiente, 2) . '</span></p>
+</div>';
 
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-$dompdf->stream('reporte-alumno-' . $alumno['codigo'] . '.pdf', ['Attachment' => true]);
+$dompdf->stream('reporte-alumno-' . $alumno['id'] . '.pdf', ['Attachment' => false]);
 exit;
